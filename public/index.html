@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgriMind AI · Parcelas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="marca">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="18" r="7" fill="#f08a24"/>
+        <rect x="4" y="27" width="40" height="5" rx="2" fill="#2fbf86"/>
+        <rect x="4" y="34" width="40" height="5" rx="2" fill="#1f9d63"/>
+        <rect x="4" y="41" width="40" height="5" rx="2" fill="#16794d"/>
+      </svg>
+      <div>
+        <h1>AgriMind AI</h1>
+        <p>Tus parcelas y su estado de riego</p>
+      </div>
+    </div>
+    <ul class="resumen" aria-label="Resumen de parcelas">
+      <li><strong id="n-total">0</strong> parcelas</li>
+      <li class="r-verde"><strong id="n-verde">0</strong> en verde</li>
+      <li class="r-amarillo"><strong id="n-amarillo">0</strong> en amarillo</li>
+      <li class="r-rojo"><strong id="n-rojo">0</strong> en rojo</li>
+    </ul>
+  </header>
+
+  <main class="contenido">
+    <section class="panel formulario" aria-labelledby="titulo-form">
+      <h2 id="titulo-form">Añadir parcela</h2>
+      <form id="form" novalidate>
+        <input type="hidden" id="id">
+
+        <label for="nombre">Nombre</label>
+        <input id="nombre" type="text" maxlength="100" required>
+
+        <label for="cultivo">Cultivo</label>
+        <input id="cultivo" type="text" maxlength="100" required>
+
+        <div class="fila">
+          <div>
+            <label for="superficie">Superficie (ha)</label>
+            <input id="superficie" type="number" min="0.01" step="0.01" required>
+          </div>
+          <div>
+            <label for="humedad">Humedad del suelo (%)</label>
+            <input id="humedad" type="number" min="0" max="100" step="0.1" required>
+          </div>
+        </div>
+
+        <label for="estado">Estado de alerta</label>
+        <select id="estado">
+          <option value="verde">Verde: todo en orden</option>
+          <option value="amarillo">Amarillo: vigilar</option>
+          <option value="rojo">Rojo: actuar ya</option>
+        </select>
+
+        <label for="notas">Notas</label>
+        <textarea id="notas" rows="3"></textarea>
+
+        <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+
+        <div class="acciones">
+          <button type="submit" id="btn-guardar" class="btn primario">Añadir parcela</button>
+          <button type="button" id="btn-cancelar" class="btn secundario" hidden>Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel listado" aria-labelledby="titulo-lista">
+      <h2 id="titulo-lista">Parcelas</h2>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Cultivo</th>
+              <th class="num">Superficie</th>
+              <th class="num">Humedad</th>
+              <th>Estado</th>
+              <th>Notas</th>
+              <th><span class="solo-lectores">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p id="vacio" class="vacio" hidden>Aún no hay parcelas. Rellena el formulario para añadir la primera.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
