@@ -7,109 +7,161 @@
   <title>AgriMind AI · Parcelas</title>
 </head>
 <body>
-  <header class="cabecera">
-    <div class="marca">
+  <section id="auth" class="auth" aria-labelledby="auth-titulo">
+    <div class="auth-caja">
       <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
         <circle cx="24" cy="18" r="7" fill="#f08a24"/>
         <rect x="4" y="27" width="40" height="5" rx="2" fill="#2fbf86"/>
         <rect x="4" y="34" width="40" height="5" rx="2" fill="#1f9d63"/>
         <rect x="4" y="41" width="40" height="5" rx="2" fill="#16794d"/>
       </svg>
-      <div>
-        <h1>AgriMind AI</h1>
-        <p>Tus parcelas y su estado de riego</p>
+      <h1 id="auth-titulo">AgriMind AI</h1>
+      <p class="auth-bajada">Tus parcelas y su estado de riego</p>
+
+      <div id="login">
+        <h2>Iniciar sesión</h2>
+        <form id="form-login" novalidate>
+          <label for="login-email">Correo electrónico</label>
+          <input id="login-email" type="email" required autocomplete="email">
+
+          <label for="login-password">Contraseña</label>
+          <input id="login-password" type="password" required minlength="6" autocomplete="current-password">
+
+          <button type="submit" class="btn primario">Entrar</button>
+        </form>
+        <p class="auth-cambio">¿No tienes cuenta? <button type="button" id="auth-cambiar" class="enlace">Regístrate</button></p>
       </div>
+
+      <div id="registro" hidden>
+        <h2>Crear cuenta</h2>
+        <form id="form-registro" novalidate>
+          <label for="registro-nombre">Nombre</label>
+          <input id="registro-nombre" type="text" maxlength="100" required autocomplete="name">
+
+          <label for="registro-email">Correo electrónico</label>
+          <input id="registro-email" type="email" required autocomplete="email">
+
+          <label for="registro-password">Contraseña</label>
+          <input id="registro-password" type="password" required minlength="6" autocomplete="new-password">
+
+          <button type="submit" class="btn primario">Crear cuenta</button>
+        </form>
+        <p class="auth-cambio">¿Ya tienes cuenta? <button type="button" id="auth-volver" class="enlace">Inicia sesión</button></p>
+      </div>
+
+      <p id="auth-mensaje" class="mensaje" role="status" aria-live="polite"></p>
     </div>
-    <ul class="resumen" aria-label="Resumen de parcelas">
-      <li><strong id="n-total">0</strong> parcelas</li>
-      <li class="r-verde"><strong id="n-verde">0</strong> en verde</li>
-      <li class="r-amarillo"><strong id="n-amarillo">0</strong> en amarillo</li>
-      <li class="r-rojo"><strong id="n-rojo">0</strong> en rojo</li>
-    </ul>
-  </header>
+  </section>
 
-  <main class="contenido">
-    <section class="panel formulario" aria-labelledby="titulo-form">
-      <h2 id="titulo-form">Añadir parcela</h2>
-      <form id="form" novalidate>
-        <input type="hidden" id="id">
-
-        <label for="nombre">Nombre</label>
-        <input id="nombre" type="text" maxlength="100" required autocomplete="off">
-
-        <label for="cultivo">Cultivo</label>
-        <input id="cultivo" type="text" maxlength="100" required autocomplete="off">
-
-        <div class="fila">
-          <div>
-            <label for="superficie">Superficie (ha)</label>
-            <input id="superficie" type="number" min="0.01" step="0.01" required>
-          </div>
-          <div>
-            <label for="humedad">Humedad del suelo (%)</label>
-            <input id="humedad" type="number" min="0" max="100" step="0.1" required>
-          </div>
+  <div id="app" hidden>
+    <header class="cabecera">
+      <div class="marca">
+        <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+          <circle cx="24" cy="18" r="7" fill="#f08a24"/>
+          <rect x="4" y="27" width="40" height="5" rx="2" fill="#2fbf86"/>
+          <rect x="4" y="34" width="40" height="5" rx="2" fill="#1f9d63"/>
+          <rect x="4" y="41" width="40" height="5" rx="2" fill="#16794d"/>
+        </svg>
+        <div>
+          <h1>AgriMind AI</h1>
+          <p>Tus parcelas y su estado de riego</p>
         </div>
+      </div>
+      <ul class="resumen" aria-label="Resumen de parcelas">
+        <li><strong id="n-total">0</strong> parcelas</li>
+        <li class="r-verde"><strong id="n-verde">0</strong> en verde</li>
+        <li class="r-amarillo"><strong id="n-amarillo">0</strong> en amarillo</li>
+        <li class="r-rojo"><strong id="n-rojo">0</strong> en rojo</li>
+      </ul>
+      <div class="sesion">
+        <span>Hola, <strong id="nombre-usuario">Agricultor</strong></span>
+        <button type="button" id="btn-logout" class="btn secundario pequeno">Cerrar sesión</button>
+      </div>
+    </header>
 
-        <fieldset class="grupo">
-          <legend>Ubicación (opcional)</legend>
+    <main class="contenido">
+      <section class="panel formulario" aria-labelledby="titulo-form">
+        <h2 id="titulo-form">Añadir parcela</h2>
+        <form id="form" novalidate>
+          <input type="hidden" id="id">
+
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" maxlength="100" required autocomplete="off">
+
+          <label for="cultivo">Cultivo</label>
+          <input id="cultivo" type="text" maxlength="100" required autocomplete="off">
+
           <div class="fila">
             <div>
-              <label for="latitud">Latitud</label>
-              <input id="latitud" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="37.7694">
+              <label for="superficie">Superficie (ha)</label>
+              <input id="superficie" type="number" min="0.01" step="0.01" required>
             </div>
             <div>
-              <label for="longitud">Longitud</label>
-              <input id="longitud" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="-3.7904">
+              <label for="humedad">Humedad del suelo (%)</label>
+              <input id="humedad" type="number" min="0" max="100" step="0.1" required>
             </div>
           </div>
-          <p class="ayuda">Usa punto decimal. La ubicación permitirá consultar el tiempo de cada parcela.</p>
-        </fieldset>
 
-        <label for="estado">Estado</label>
-        <select id="estado">
-          <option value="verde">Verde: todo en orden</option>
-          <option value="amarillo">Amarillo: vigilar</option>
-          <option value="rojo">Rojo: actuar ya</option>
-        </select>
+          <fieldset class="grupo">
+            <legend>Ubicación (opcional)</legend>
+            <div class="fila">
+              <div>
+                <label for="latitud">Latitud</label>
+                <input id="latitud" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="37.7694">
+              </div>
+              <div>
+                <label for="longitud">Longitud</label>
+                <input id="longitud" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="-3.7904">
+              </div>
+            </div>
+            <p class="ayuda">Usa punto decimal. La ubicación permitirá consultar el tiempo de cada parcela.</p>
+          </fieldset>
 
-        <label for="notas">Notas</label>
-        <textarea id="notas" rows="3"></textarea>
+          <label for="estado">Estado</label>
+          <select id="estado">
+            <option value="verde">Verde: todo en orden</option>
+            <option value="amarillo">Amarillo: vigilar</option>
+            <option value="rojo">Rojo: actuar ya</option>
+          </select>
 
-        <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+          <label for="notas">Notas</label>
+          <textarea id="notas" rows="3"></textarea>
 
-        <div class="acciones">
-          <button type="submit" id="btn-guardar" class="btn primario">Añadir parcela</button>
-          <button type="button" id="btn-cancelar" class="btn secundario" hidden>Cancelar</button>
+          <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+
+          <div class="acciones">
+            <button type="submit" id="btn-guardar" class="btn primario">Añadir parcela</button>
+            <button type="button" id="btn-cancelar" class="btn secundario" hidden>Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel listado" aria-labelledby="titulo-lista">
+        <div class="listado-cabecera">
+          <h2 id="titulo-lista">Parcelas</h2>
+          <button type="button" id="btn-ejemplos" class="btn ejemplo">Cargar parcelas de ejemplo</button>
         </div>
-      </form>
-    </section>
-
-    <section class="panel listado" aria-labelledby="titulo-lista">
-      <div class="listado-cabecera">
-        <h2 id="titulo-lista">Parcelas</h2>
-        <button type="button" id="btn-ejemplos" class="btn ejemplo">Cargar parcelas de ejemplo</button>
-      </div>
-      <div class="tabla-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Cultivo</th>
-              <th class="num">Superficie</th>
-              <th class="num">Humedad</th>
-              <th class="num">Ubicación</th>
-              <th>Estado</th>
-              <th>Notas</th>
-              <th><span class="solo-lectores">Acciones</span></th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <p id="vacio" class="vacio" hidden>Aún no hay parcelas. Añade la primera o carga las parcelas de ejemplo.</p>
-    </section>
-  </main>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cultivo</th>
+                <th class="num">Superficie</th>
+                <th class="num">Humedad</th>
+                <th class="num">Ubicación</th>
+                <th>Estado</th>
+                <th>Notas</th>
+                <th><span class="solo-lectores">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p id="vacio" class="vacio" hidden>Aún no hay parcelas. Añade la primera o carga las parcelas de ejemplo.</p>
+      </section>
+    </main>
+  </div>
 
   <script type="module" src="/src/main.js"></script>
 </body>

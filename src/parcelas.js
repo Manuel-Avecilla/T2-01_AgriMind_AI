@@ -170,6 +170,15 @@ async function cargarEjemplos() {
   }
 }
 
+// Solo se llama cuando hay una sesión válida: RLS filtra por auth.uid().
+export async function recargarParcelas() {
+  try {
+    await recargar();
+  } catch (err) {
+    avisar(err.message, true);
+  }
+}
+
 export function iniciarParcelas() {
   form = $('form');
   mensaje = $('mensaje');
@@ -208,6 +217,4 @@ export function iniciarParcelas() {
   });
 
   $('btn-ejemplos').addEventListener('click', cargarEjemplos);
-
-  recargar().catch((err) => avisar(err.message, true));
 }

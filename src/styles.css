@@ -125,6 +125,7 @@ textarea { resize: vertical; }
 .btn.ejemplo { background: var(--sol); color: var(--marino); border-color: var(--sol); font-weight: 700; }
 .btn.ejemplo:hover { background: #dc7a1b; border-color: #dc7a1b; }
 .btn.pequeno { padding: 0.35rem 0.7rem; font-size: 0.9rem; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Tabla */
 .tabla-scroll { overflow-x: auto; }
@@ -152,6 +153,35 @@ tbody tr.editando { background: #eaf7f0; }
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
+/* Acceso (Fase 3) */
+.auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  background: radial-gradient(circle at 50% 0, var(--marino-2), var(--marino) 75%);
+}
+.auth-caja {
+  width: min(100%, 420px);
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  box-shadow: 0 18px 44px rgba(15, 42, 71, 0.2);
+  padding: 2rem clamp(1.25rem, 5vw, 2rem);
+}
+.auth-caja > .logo { display: block; margin: 0 auto 0.4rem; width: 48px; height: 48px; }
+.auth-caja h1 { margin: 0; text-align: center; color: var(--marino); font-size: 1.7rem; }
+.auth-bajada { margin: 0.2rem 0 1.5rem; text-align: center; color: var(--tinta-suave); font-size: 0.95rem; }
+.auth-caja h2 { margin: 0; font-size: 1.2rem; color: var(--marino); }
+.auth-caja .btn.primario { width: 100%; margin-top: 1.25rem; }
+.auth-cambio { margin: 1.1rem 0 0; font-size: 0.92rem; color: var(--tinta-suave); text-align: center; }
+.enlace {
+  font: inherit; font-weight: 700; color: var(--esmeralda-osc);
+  background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline;
+}
+.sesion { display: flex; align-items: center; gap: 0.75rem; color: #d6e2ef; font-size: 0.95rem; }
+.sesion strong { color: #fff; }
+
 @media (max-width: 900px) {
   .contenido { grid-template-columns: 1fr; }
   .formulario { position: static; }
@@ -159,6 +189,8 @@ tbody tr.editando { background: #eaf7f0; }
 
 @media (max-width: 640px) {
   .cabecera { padding: 1rem; }
+  .auth { padding: 1rem; }
+  .sesion { width: 100%; justify-content: space-between; }
   .marca h1 { font-size: 1.45rem; }
   .resumen { width: 100%; gap: 0.35rem 1rem; }
   .resumen strong { font-size: 1.15rem; }
