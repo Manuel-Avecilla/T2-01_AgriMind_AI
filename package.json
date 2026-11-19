@@ -1,13 +1,20 @@
 {
   "name": "agrimind-parcelas",
-  "version": "1.0.0",
-  "description": "AgriMind AI: gestión sencilla de parcelas (CRUD)",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "AgriMind AI: gestión de parcelas con Vite y Supabase",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "start": "node server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "pg": "^8.12.0"
+    "@fontsource-variable/public-sans": "^5.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
   }
 }
