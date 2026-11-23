@@ -3,6 +3,8 @@ import './styles.css';
 import { supabase } from './supabaseClient.js';
 import { cerrarSesion, iniciarFormulariosAuth, obtenerNombre } from './auth.js';
 import { iniciarParcelas, recargarParcelas } from './parcelas.js';
+import { iniciarPanelAlertas, recargarAlertas } from './alertas.js';
+import { iniciarLecturas } from './lecturas.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -10,11 +12,26 @@ const vistaAuth = $('auth');
 const vistaApp = $('app');
 const nombreUsuario = $('nombre-usuario');
 
-let parcelasIniciadas = false;
+let fase5Iniciada = false;
 
 function mostrarVista(haySesion) {
   vistaAuth.hidden = haySesion;
   vistaApp.hidden = !haySesion;
+}
+
+function limpiarPanel() {
+  $('tbody').replaceChildren();
+  $('lista-alertas').replaceChildren();
+  for (const id of ['n-total', 'n-verde', 'n-amarillo', 'n-rojo', 'n-alertas', 'n-alertas-panel']) {
+    $(id).textContent = '0';
+  }
+  $('vacio').hidden = false;
+  $('alertas-vacio').hidden = false;
+  if ($('dialog-lectura')?.open) $('dialog-lectura').close();
+}
+
+async function recargarPanel() {
+  await Promise.all([recargarParcelas(), recargarAlertas()]);
 }
 
 async function alCambiarSesion(evento, session) {
@@ -24,12 +41,15 @@ async function alCambiarSesion(evento, session) {
 
   if (!session) {
     nombreUsuario.textContent = 'Agricultor';
+    limpiarPanel();
     return;
   }
 
-  if (!parcelasIniciadas) {
-    iniciarParcelas();
-    parcelasIniciadas = true;
+  if (!fase5Iniciada) {
+    iniciarPanelAlertas();
+    iniciarLecturas({ onCambio: recargarPanel });
+    iniciarParcelas({ onCambio: recargarPanel });
+    fase5Iniciada = true;
   }
 
   try {
@@ -39,7 +59,7 @@ async function alCambiarSesion(evento, session) {
     nombreUsuario.textContent = session.user.email?.split('@')[0] ?? 'Agricultor';
   }
 
-  await recargarParcelas();
+  await recargarPanel();
 }
 
 $('btn-logout').addEventListener('click', async () => {

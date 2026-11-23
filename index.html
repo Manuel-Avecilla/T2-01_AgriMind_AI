@@ -72,12 +72,23 @@
         <li class="r-verde"><strong id="n-verde">0</strong> en verde</li>
         <li class="r-amarillo"><strong id="n-amarillo">0</strong> en amarillo</li>
         <li class="r-rojo"><strong id="n-rojo">0</strong> en rojo</li>
+        <li class="r-alerta"><strong id="n-alertas">0</strong> alertas activas</li>
       </ul>
       <div class="sesion">
         <span>Hola, <strong id="nombre-usuario">Agricultor</strong></span>
         <button type="button" id="btn-logout" class="btn secundario pequeno">Cerrar sesión</button>
       </div>
     </header>
+
+    <section class="panel alertas" aria-labelledby="titulo-alertas">
+      <div class="listado-cabecera">
+        <h2 id="titulo-alertas">Alertas activas</h2>
+        <span id="n-alertas-panel" class="conteo" aria-hidden="true">0</span>
+      </div>
+      <p id="alertas-mensaje" class="mensaje" role="status" aria-live="polite"></p>
+      <ul id="lista-alertas" class="lista-alertas"></ul>
+      <p id="alertas-vacio" class="vacio">Sin alertas activas. Las lecturas crearán las que hagan falta.</p>
+    </section>
 
     <main class="contenido">
       <section class="panel formulario" aria-labelledby="titulo-form">
@@ -117,12 +128,13 @@
             <p class="ayuda">Usa punto decimal. La ubicación permitirá consultar el tiempo de cada parcela.</p>
           </fieldset>
 
-          <label for="estado">Estado</label>
-          <select id="estado">
+          <label for="estado">Estado (calculado)</label>
+          <select id="estado" disabled>
             <option value="verde">Verde: todo en orden</option>
             <option value="amarillo">Amarillo: vigilar</option>
             <option value="rojo">Rojo: actuar ya</option>
           </select>
+          <p class="ayuda">El semáforo se calcula solo con la humedad de cada lectura.</p>
 
           <label for="notas">Notas</label>
           <textarea id="notas" rows="3"></textarea>
@@ -139,7 +151,10 @@
       <section class="panel listado" aria-labelledby="titulo-lista">
         <div class="listado-cabecera">
           <h2 id="titulo-lista">Parcelas</h2>
-          <button type="button" id="btn-ejemplos" class="btn ejemplo">Cargar parcelas de ejemplo</button>
+          <div class="acciones">
+            <button type="button" id="btn-exportar-parcelas" class="btn secundario pequeno">Exportar CSV</button>
+            <button type="button" id="btn-ejemplos" class="btn ejemplo">Cargar parcelas de ejemplo</button>
+          </div>
         </div>
         <div class="tabla-scroll">
           <table>
@@ -162,6 +177,46 @@
       </section>
     </main>
   </div>
+
+  <dialog id="dialog-lectura" class="dialogo-lectura" aria-labelledby="lectura-titulo">
+    <div class="dialogo-cabecera">
+      <h2 id="lectura-titulo">Registrar lectura</h2>
+      <button type="button" id="btn-cerrar-lectura" class="btn secundario pequeno" aria-label="Cerrar ventana">Cerrar</button>
+    </div>
+
+    <form id="form-lectura" novalidate>
+      <div class="fila">
+        <div>
+          <label for="lectura-humedad">Humedad del suelo (%)</label>
+          <input id="lectura-humedad" type="number" min="0" max="100" step="0.1" required>
+        </div>
+        <div>
+          <label for="lectura-ph">pH (opcional)</label>
+          <input id="lectura-ph" type="number" min="0" max="14" step="0.1">
+        </div>
+      </div>
+
+      <label for="lectura-fecha">Fecha y hora de la medición</label>
+      <input id="lectura-fecha" type="datetime-local">
+
+      <p id="lectura-mensaje" class="mensaje" role="status" aria-live="polite"></p>
+
+      <div class="acciones">
+        <button type="submit" id="btn-guardar-lectura" class="btn primario">Guardar lectura</button>
+        <button type="button" id="btn-exportar-csv" class="btn secundario">Exportar CSV de esta parcela</button>
+      </div>
+    </form>
+
+    <div class="historial">
+      <h3>Historial de humedad</h3>
+      <p id="lectura-stats" class="ayuda">Sin lecturas registradas.</p>
+      <div class="grafico-caja">
+        <canvas id="grafico-humedad" role="img" aria-label="Evolución de la humedad del suelo"></canvas>
+      </div>
+      <p id="grafico-vacio" class="vacio" hidden>Aún no hay lecturas. Registra la primera para ver la evolución.</p>
+      <p id="historial-mensaje" class="mensaje" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
 
   <script type="module" src="/src/main.js"></script>
 </body>

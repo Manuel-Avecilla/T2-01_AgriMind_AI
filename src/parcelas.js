@@ -1,5 +1,7 @@
 import { supabase } from './supabaseClient.js';
 import { parcelasEjemplo } from './datosEjemplo.js';
+import { evaluarParcela } from './alertas.js';
+import { abrirRegistro, abrirHistorial, exportarParcelas } from './lecturas.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -20,6 +22,12 @@ const ETIQUETAS = { verde: 'Verde', amarillo: 'Amarillo', rojo: 'Rojo' };
 let form;
 let mensaje;
 let parcelas = [];
+let onCambio = async () => {};
+
+// Tras un cambio, recargamos parcelas y alertas a la vez (lo orquesta main.js).
+async function actualizar() {
+  await onCambio();
+}
 
 function avisar(texto, esError = false) {
   mensaje.textContent = texto;
@@ -64,6 +72,21 @@ function pintar() {
     tr.append(tdEstado, celda(p.notas ?? '', 'notas', 'Notas'));
 
     const tdBotones = celda('', 'botones', 'Acciones');
+
+    const medir = document.createElement('button');
+    medir.type = 'button';
+    medir.className = 'btn primario pequeno';
+    medir.textContent = 'Medir';
+    medir.setAttribute('aria-label', `Registrar lectura de ${p.nombre}`);
+    medir.addEventListener('click', () => abrirRegistro(p));
+
+    const historial = document.createElement('button');
+    historial.type = 'button';
+    historial.className = 'btn secundario pequeno';
+    historial.textContent = 'Historial';
+    historial.setAttribute('aria-label', `Ver historial de ${p.nombre}`);
+    historial.addEventListener('click', () => abrirHistorial(p));
+
     const editar = document.createElement('button');
     editar.type = 'button';
     editar.className = 'btn secundario pequeno';
@@ -78,7 +101,7 @@ function pintar() {
     borrar.setAttribute('aria-label', `Borrar ${p.nombre}`);
     borrar.addEventListener('click', () => borrarParcela(p));
 
-    tdBotones.append(editar, borrar);
+    tdBotones.append(medir, historial, editar, borrar);
     tr.append(tdBotones);
     tbody.append(tr);
   }
@@ -140,7 +163,7 @@ function leerCuerpo() {
     humedad_suelo: Number(campos.humedad.value),
     latitud: opcional(campos.latitud.value),
     longitud: opcional(campos.longitud.value),
-    estado: campos.estado.value,
+    estado: evaluarParcela(campos.humedad.value).estado,
     notas: campos.notas.value.trim(),
   };
 }
@@ -152,7 +175,7 @@ async function borrarParcela(p) {
     if (error) throw error;
     if (campos.id.value === p.id) reiniciarFormulario();
     avisar(`Parcela «${p.nombre}» borrada.`);
-    await recargar();
+    await actualizar();
   } catch (err) {
     avisar(err.message, true);
   }
@@ -164,7 +187,7 @@ async function cargarEjemplos() {
     const { error } = await supabase.from('parcelas').insert(parcelasEjemplo);
     if (error) throw error;
     avisar('Parcelas de ejemplo cargadas.');
-    await recargar();
+    await actualizar();
   } catch (err) {
     avisar(err.message, true);
   }
@@ -179,7 +202,8 @@ export async function recargarParcelas() {
   }
 }
 
-export function iniciarParcelas() {
+export function iniciarParcelas({ onCambio: callback } = {}) {
+  onCambio = callback ?? (async () => { await recargar(); });
   form = $('form');
   mensaje = $('mensaje');
 
@@ -204,7 +228,7 @@ export function iniciarParcelas() {
 
       reiniciarFormulario();
       avisar(editando ? 'Cambios guardados.' : 'Parcela añadida.');
-      await recargar();
+      await actualizar();
     } catch (err) {
       avisar(err.message, true);
     }
@@ -217,4 +241,5 @@ export function iniciarParcelas() {
   });
 
   $('btn-ejemplos').addEventListener('click', cargarEjemplos);
+  $('btn-exportar-parcelas').addEventListener('click', () => exportarParcelas(parcelas));
 }

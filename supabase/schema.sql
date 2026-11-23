@@ -63,6 +63,11 @@ create index if not exists alertas_user_estado_idx
 create index if not exists alertas_parcela_id_idx
   on public.alertas (parcela_id);
 
+-- Fase 5: una sola alerta activa por parcela y tipo. Es la red de seguridad
+-- frente al check-then-insert del cliente (doble clic o dos pestañas).
+create unique index if not exists alertas_activas_por_tipo_idx
+  on public.alertas (parcela_id, tipo) where estado = 'activa';
+
 -- 3. Permisos de la Data API ------------------------------------------------
 -- RLS decide QUÉ filas ve cada usuario; los GRANT deciden SI puede llamar a la API.
 -- anon no recibe ningún permiso: hasta la Fase 3 solo entra authenticated.

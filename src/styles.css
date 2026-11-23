@@ -51,6 +51,7 @@ body {
 .r-verde::before { background: var(--verde); }
 .r-amarillo::before { background: var(--amarillo); }
 .r-rojo::before { background: var(--rojo); }
+.r-alerta::before { background: var(--rojo); box-shadow: 0 0 0 2px rgba(214, 69, 69, 0.22); }
 
 /* Estructura */
 .contenido {
@@ -80,6 +81,43 @@ body {
   margin-bottom: 1rem;
 }
 .listado-cabecera h2 { margin: 0; }
+
+/* Alertas activas (Fase 5): lista con rail de nivel, no rejilla de tarjetas. */
+.alertas { grid-column: 1 / -1; }
+.conteo {
+  min-width: 2rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: #fde8e8;
+  color: #9b2424;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+.lista-alertas { list-style: none; margin: 0; padding: 0; }
+.alerta-item {
+  position: relative;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 0.9rem 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--borde);
+}
+.alerta-item:last-child { border-bottom: 0; }
+.alerta-item::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+.alerta-item.nivel-amarillo::before { background: var(--amarillo); }
+.alerta-item.nivel-rojo::before { background: var(--rojo); }
+.alerta-cabecera { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.alerta-cabecera strong { font-size: 1.05rem; color: var(--marino); }
+.alerta-mensaje { margin: 0; font-weight: 600; }
+.alerta-causa { margin: 0; font-size: 0.92rem; color: var(--tinta-suave); }
+.alerta-causa strong { color: var(--marino-2); }
+.alerta-acciones { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.35rem; }
+
+@media (min-width: 700px) {
+  .alerta-item { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .alerta-cabecera, .alerta-mensaje, .alerta-causa { grid-column: 1; }
+  .alerta-acciones { grid-column: 2; grid-row: 1 / span 3; align-self: center; margin: 0; }
+}
 
 /* Formulario */
 label { display: block; margin: 0.9rem 0 0.3rem; font-size: 0.95rem; font-weight: 600; color: var(--marino-2); }
@@ -153,6 +191,27 @@ tbody tr.editando { background: #eaf7f0; }
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
+/* Diálogo de lecturas (Fase 5). La gráfica con franjas es el punto focal. */
+.dialogo-lectura {
+  width: min(100% - 2rem, 720px);
+  max-height: min(90vh, 900px);
+  overflow-y: auto;
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--blanco);
+  color: var(--tinta);
+}
+.dialogo-lectura::backdrop { background: rgba(15, 42, 71, 0.62); }
+.dialogo-cabecera {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1rem;
+}
+.dialogo-cabecera h2 { margin: 0; font-size: 1.4rem; color: var(--marino); }
+.historial { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid var(--borde); }
+.historial h3 { margin: 0; font-size: 1.05rem; color: var(--marino); }
+.grafico-caja { position: relative; height: 260px; margin-top: 0.75rem; }
+
 /* Acceso (Fase 3) */
 .auth {
   min-height: 100vh;
@@ -198,6 +257,10 @@ tbody tr.editando { background: #eaf7f0; }
   .panel { padding: 1rem; }
   .listado-cabecera { flex-direction: column; align-items: stretch; }
   .btn.ejemplo { width: 100%; }
+  .listado-cabecera .acciones { width: 100%; }
+  .alerta-acciones { width: 100%; }
+  .dialogo-lectura { width: calc(100% - 1rem); padding: 1rem; }
+  .grafico-caja { height: 220px; }
   table { min-width: 0; }
   thead { display: none; }
   tbody tr { display: block; padding: 0.85rem 0; border-bottom: 1px solid var(--borde); }
