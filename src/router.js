@@ -1,8 +1,5 @@
 import { mostrarFormularioAuth } from './auth.js';
 
-// SPA ligera: las tres vistas viven en el DOM y solo se alterna `hidden`.
-// El estado de sesión lo fija main.js desde onAuthStateChange; aquí solo decide
-// qué vista se muestra y protege el panel.
 const VISTAS = new Map([
   ['inicio', { id: 'inicio', titulo: 'AgriMind AI · Agricultura de precisión', etiqueta: 'Inicio', tituloId: 'inicio-titulo' }],
   ['acceso', { id: 'auth', titulo: 'AgriMind AI · Acceso', etiqueta: 'Acceso', tituloId: 'auth-titulo' }],
@@ -10,6 +7,7 @@ const VISTAS = new Map([
 ]);
 
 let conSesion = false;
+let sesionConocida = false;
 
 function leerRuta() {
   const crudo = window.location.hash.replace(/^#\/?/, '');
@@ -27,12 +25,30 @@ function irA(nombre) {
   }
 }
 
-export function render(session, { foco = false } = {}) {
+function ocultarTodasLasVistas() {
+  for (const vista of VISTAS.values()) {
+    const nodo = document.getElementById(vista.id);
+    if (nodo) nodo.hidden = true;
+  }
+}
+
+export function render(session, { foco = false, conocido = true } = {}) {
+  sesionConocida = conocido;
   conSesion = Boolean(session);
+
   const ruta = leerRuta();
 
-  // Guardias de sesión: sin cuenta no se puede ver el panel; con cuenta no
-  // tiene sentido volver al formulario de acceso.
+  // Mientras la sesión no se conoce, no se muestra ninguna vista protegida ni
+  // formularios: se mantiene el boot para evitar parpadeos y fugas de UI.
+  if (!sesionConocida) {
+    ocultarTodasLasVistas();
+    for (const enlace of document.querySelectorAll('[data-nav]')) {
+      const tipo = enlace.dataset.nav;
+      enlace.hidden = tipo === 'app' || tipo === 'auth';
+    }
+    return;
+  }
+
   if (ruta.nombre === 'panel' && !conSesion) {
     irA('acceso');
     ruta.nombre = 'acceso';
@@ -44,7 +60,8 @@ export function render(session, { foco = false } = {}) {
   }
 
   for (const [clave, vista] of VISTAS) {
-    document.getElementById(vista.id).hidden = clave !== ruta.nombre;
+    const nodo = document.getElementById(vista.id);
+    if (nodo) nodo.hidden = clave !== ruta.nombre;
   }
 
   for (const enlace of document.querySelectorAll('[data-nav]')) {
@@ -77,6 +94,8 @@ export function render(session, { foco = false } = {}) {
 }
 
 export function iniciarRouter() {
-  window.addEventListener('hashchange', () => render(conSesion, { foco: true }));
-  render(conSesion);
+  window.addEventListener('hashchange', () => render(conSesion, { foco: true, conocido: sesionConocida }));
+  if (sesionConocida) {
+    render(conSesion, { conocido: true });
+  }
 }

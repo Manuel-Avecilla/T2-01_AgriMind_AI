@@ -240,6 +240,55 @@
   .grafico-caja {
     @apply relative mt-3 h-64;
   }
+
+  .boot {
+    @apply flex min-h-[45vh] flex-1 items-center justify-center px-4 py-16;
+  }
+  .boot[hidden] {
+    display: none !important;
+  }
+  .boot-caja {
+    @apply flex flex-col items-center gap-3 rounded border border-borde bg-white px-8 py-10 text-center;
+  }
+  .boot-logo {
+    @apply h-12 w-12;
+  }
+  .boot-texto {
+    @apply m-0 text-sm font-medium text-tinta-suave;
+  }
+
+  .btn-google {
+    @apply border-borde bg-white text-marino hover:bg-papel;
+  }
+  .btn-google svg {
+    @apply shrink-0;
+  }
+
+  .auth-separador {
+    @apply my-5 flex items-center gap-3 text-xs font-medium tracking-wide text-tinta-suave uppercase;
+  }
+  .auth-separador::before,
+  .auth-separador::after {
+    content: "";
+    @apply h-px flex-1 bg-borde;
+  }
+  .auth-separador span {
+    @apply shrink-0;
+  }
+
+  .campo-password {
+    @apply relative;
+  }
+  .campo-password input {
+    @apply pr-24;
+  }
+  .btn-toggle-password {
+    @apply absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-sm font-semibold text-esmeralda-osc hover:bg-esmeralda-suave;
+  }
+  .btn-toggle-password:focus-visible {
+    outline: 2px solid var(--color-marino);
+    outline-offset: 1px;
+  }
 }
 
 @media (min-width: 700px) {
