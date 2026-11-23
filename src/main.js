@@ -5,19 +5,13 @@ import { cerrarSesion, iniciarFormulariosAuth, obtenerNombre } from './auth.js';
 import { iniciarParcelas, recargarParcelas } from './parcelas.js';
 import { iniciarPanelAlertas, recargarAlertas } from './alertas.js';
 import { iniciarLecturas } from './lecturas.js';
+import { render, iniciarRouter } from './router.js';
 
 const $ = (id) => document.getElementById(id);
 
-const vistaAuth = $('auth');
-const vistaApp = $('app');
 const nombreUsuario = $('nombre-usuario');
 
 let fase5Iniciada = false;
-
-function mostrarVista(haySesion) {
-  vistaAuth.hidden = haySesion;
-  vistaApp.hidden = !haySesion;
-}
 
 function limpiarPanel() {
   $('tbody').replaceChildren();
@@ -37,7 +31,7 @@ async function recargarPanel() {
 async function alCambiarSesion(evento, session) {
   if (!['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'USER_UPDATED'].includes(evento)) return;
 
-  mostrarVista(Boolean(session));
+  render(session);
 
   if (!session) {
     nombreUsuario.textContent = 'Agricultor';
@@ -71,6 +65,7 @@ $('btn-logout').addEventListener('click', async () => {
 });
 
 iniciarFormulariosAuth();
+iniciarRouter();
 
 // El evento INITIAL_SESSION llega al suscribirnos y ya trae la sesión guardada.
 supabase.auth.onAuthStateChange((evento, session) => {

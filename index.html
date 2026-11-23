@@ -4,179 +4,290 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f2a47">
-  <title>AgriMind AI · Parcelas</title>
+  <meta name="description" content="AgriMind AI: agricultura de precisión, optimización del riego y alertas explicables para tus parcelas.">
+  <title>AgriMind AI · Agricultura de precisión</title>
 </head>
-<body>
-  <section id="auth" class="auth" aria-labelledby="auth-titulo">
-    <div class="auth-caja">
-      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="18" r="7" fill="#f08a24"/>
-        <rect x="4" y="27" width="40" height="5" rx="2" fill="#2fbf86"/>
-        <rect x="4" y="34" width="40" height="5" rx="2" fill="#1f9d63"/>
-        <rect x="4" y="41" width="40" height="5" rx="2" fill="#16794d"/>
-      </svg>
-      <h1 id="auth-titulo">AgriMind AI</h1>
-      <p class="auth-bajada">Tus parcelas y su estado de riego</p>
+<body class="flex min-h-screen flex-col">
+  <!-- Logotipo de marca: mente que piensa el campo (perfil, sol naciente,
+       franjas de cultivo y hoja). Se reutiliza con <use> en toda la interfaz. -->
+  <svg aria-hidden="true" class="hidden" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="logo-agrimind" viewBox="0 0 48 48">
+      <path d="M27.5 4.5c-8.7 0-15.8 7-15.8 15.6 0 3.4 1.1 6.6 3 9.2v6.2c0 1.9 1.5 3.4 3.4 3.4h12.4V4.5h-.8Z" fill="#0f2a47"/>
+      <circle cx="23.5" cy="17.5" r="4.2" fill="#f08a24"/>
+      <g stroke="#f08a24" stroke-width="1.4" stroke-linecap="round">
+        <path d="M23.5 9.5v2.2M16 17.5h2.2M28.8 17.5h2.2M18.2 12.2l1.6 1.6M28.8 12.2l-1.6 1.6"/>
+      </g>
+      <path d="M13 27.5h17v3H13z" fill="#2fbf86"/>
+      <path d="M14.5 31.5h15.5v3H14.5z" fill="#1f9d63"/>
+      <path d="M16 35.5h14v3H16z" fill="#16794d"/>
+      <path d="M28 38.5c3.6-.6 6.2-2.7 7-6.2-3.7.3-6.4 2.4-7 6.2Z" fill="#2fbf86"/>
+    </symbol>
+  </svg>
 
-      <div id="login">
-        <h2>Iniciar sesión</h2>
-        <form id="form-login" novalidate>
-          <label for="login-email">Correo electrónico</label>
-          <input id="login-email" type="email" required autocomplete="email">
+  <header class="cabecera sticky top-0 z-30 border-b border-borde bg-white/95 backdrop-blur-sm">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <a href="#/inicio" class="flex items-center gap-2.5 text-marino no-underline">
+        <svg class="h-9 w-9 shrink-0" aria-hidden="true" focusable="false"><use href="#logo-agrimind"/></svg>
+        <span class="flex flex-col leading-tight">
+          <span class="text-lg font-bold tracking-tight">AgriMind AI</span>
+          <span class="hidden text-xs font-normal text-tinta-suave sm:block">Agricultura de precisión</span>
+        </span>
+      </a>
 
-          <label for="login-password">Contraseña</label>
-          <input id="login-password" type="password" required minlength="6" autocomplete="current-password">
+      <nav aria-label="Navegación principal" class="order-3 flex w-full items-center gap-1 border-t border-borde pt-2 sm:order-none sm:w-auto sm:border-0 sm:pt-0">
+        <a data-nav="inicio" href="#/inicio" aria-current="page" class="rounded px-3 py-1.5 text-sm font-semibold text-marino no-underline hover:bg-papel">Inicio</a>
+        <a data-nav="app" href="#/panel" hidden class="rounded px-3 py-1.5 text-sm font-semibold text-marino no-underline hover:bg-papel">Panel</a>
+        <a data-nav="auth" href="#/acceso" class="rounded px-3 py-1.5 text-sm font-semibold text-marino no-underline hover:bg-papel">Acceso</a>
+      </nav>
 
-          <button type="submit" class="btn primario">Entrar</button>
-        </form>
-        <p class="auth-cambio">¿No tienes cuenta? <button type="button" id="auth-cambiar" class="enlace">Regístrate</button></p>
+      <div data-nav="app" hidden class="flex items-center gap-3">
+        <span class="hidden text-sm text-tinta-suave md:inline">Hola, <strong id="nombre-usuario" class="font-semibold text-marino">Agricultor</strong></span>
+        <button type="button" id="btn-logout" class="btn secundario pequeno">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="vista-anuncio" class="sr-only" role="status" aria-live="polite"></div>
+
+  <!-- VISTA 1 · INICIO ---------------------------------------------------- -->
+  <section id="inicio" aria-labelledby="inicio-titulo" class="flex-1">
+    <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+      <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
+        <div>
+          <h1 id="inicio-titulo" tabindex="-1" class="m-0 max-w-2xl text-4xl font-bold tracking-tight text-marino sm:text-5xl">Decisiones de riego que se pueden explicar.</h1>
+          <p class="mt-6 max-w-xl text-lg text-tinta-suave">AgriMind AI convierte la humedad del suelo y las reglas agronómicas en avisos claros: qué ocurre, por qué ocurre y qué conviene hacer.</p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a data-nav="auth" href="#/acceso" class="btn primario">Entrar</a>
+            <a data-nav="auth" href="#/acceso?tab=registro" class="btn secundario">Crear cuenta</a>
+            <a data-nav="app" href="#/panel" hidden class="btn primario">Ir al panel</a>
+          </div>
+          <p class="mt-6 text-sm text-tinta-suave">Sin tarjetas de pago. Tus parcelas y tus datos, bajo tu cuenta.</p>
+        </div>
+
+        <!-- El motif de franjas del logotipo se convierte en semáforo real. -->
+        <div class="border border-borde bg-white p-6">
+          <div class="mb-4 flex items-center justify-between border-b border-borde pb-3">
+            <h2 class="m-0 text-base font-semibold text-marino">Estado del campo</h2>
+            <span class="text-xs text-tinta-suave">Ejemplo</span>
+          </div>
+          <ul class="m-0 list-none space-y-4 p-0">
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-verde" aria-hidden="true"></span>
+              <div>
+                <p class="m-0 font-semibold text-marino">Sin incidencias</p>
+                <p class="m-0 text-sm text-tinta-suave">Humedad 41 %. Riego programado con normalidad.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-amarillo" aria-hidden="true"></span>
+              <div>
+                <p class="m-0 font-semibold text-marino">Humedad baja</p>
+                <p class="m-0 text-sm text-tinta-suave">27,5 %. Planifica el riego de esta semana.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-rojo" aria-hidden="true"></span>
+              <div>
+                <p class="m-0 font-semibold text-marino">Humedad crítica</p>
+                <p class="m-0 text-sm text-tinta-suave">14 %. Causa: por debajo del umbral del 20 %.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div id="registro" hidden>
-        <h2>Crear cuenta</h2>
-        <form id="form-registro" novalidate>
-          <label for="registro-nombre">Nombre</label>
-          <input id="registro-nombre" type="text" maxlength="100" required autocomplete="name">
-
-          <label for="registro-email">Correo electrónico</label>
-          <input id="registro-email" type="email" required autocomplete="email">
-
-          <label for="registro-password">Contraseña</label>
-          <input id="registro-password" type="password" required minlength="6" autocomplete="new-password">
-
-          <button type="submit" class="btn primario">Crear cuenta</button>
-        </form>
-        <p class="auth-cambio">¿Ya tienes cuenta? <button type="button" id="auth-volver" class="enlace">Inicia sesión</button></p>
+      <div class="mt-16 grid gap-8 border-t border-borde pt-10 md:grid-cols-3">
+        <div>
+          <svg class="h-6 w-6 text-esmeralda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 20V10m5 10V5m5 15v-7m5 7V8" stroke-linecap="round"/><path d="M2 20h20" stroke-linecap="round"/></svg>
+          <h2 class="mb-2 mt-4 text-lg font-semibold text-marino">Agricultura de precisión</h2>
+          <p class="m-0 text-sm leading-relaxed text-tinta-suave">Cada parcela, su humedad y su historial en un mismo lugar. Menos hojas dispersas, más criterio para decidir.</p>
+        </div>
+        <div>
+          <svg class="h-6 w-6 text-esmeralda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3c3.5 4 6 7.1 6 10.4a6 6 0 0 1-12 0C6 10.1 8.5 7 12 3Z" stroke-linejoin="round"/><path d="M9 15.5c.6 1.4 1.7 2.2 3 2.3" stroke-linecap="round"/></svg>
+          <h2 class="mb-2 mt-4 text-lg font-semibold text-marino">Optimización del riego</h2>
+          <p class="m-0 text-sm leading-relaxed text-tinta-suave">Reglas claras que indican cuándo regar y cuándo parar, para gastar agua solo donde hace falta.</p>
+        </div>
+        <div>
+          <svg class="h-6 w-6 text-esmeralda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3 4 6.5v5.2c0 4.4 3.2 7.9 8 9.3 4.8-1.4 8-4.9 8-9.3V6.5L12 3Z" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2 class="mb-2 mt-4 text-lg font-semibold text-marino">Alertas explicables</h2>
+          <p class="m-0 text-sm leading-relaxed text-tinta-suave">Cada aviso incluye su causa: qué dato lo originó y qué umbral se ha superado. Tú decides qué hacer.</p>
+        </div>
       </div>
-
-      <p id="auth-mensaje" class="mensaje" role="status" aria-live="polite"></p>
     </div>
   </section>
 
-  <div id="app" hidden>
-    <header class="cabecera">
-      <div class="marca">
-        <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
-          <circle cx="24" cy="18" r="7" fill="#f08a24"/>
-          <rect x="4" y="27" width="40" height="5" rx="2" fill="#2fbf86"/>
-          <rect x="4" y="34" width="40" height="5" rx="2" fill="#1f9d63"/>
-          <rect x="4" y="41" width="40" height="5" rx="2" fill="#16794d"/>
-        </svg>
+  <!-- VISTA 2 · ACCESO ---------------------------------------------------- -->
+  <section id="auth" aria-labelledby="auth-titulo" class="flex-1" hidden>
+    <div class="mx-auto flex max-w-6xl items-center justify-center px-4 py-14 sm:px-6">
+      <div class="auth-caja">
+        <svg class="mx-auto mb-3 h-12 w-12" aria-hidden="true" focusable="false"><use href="#logo-agrimind"/></svg>
+        <h1 id="auth-titulo" tabindex="-1" class="m-0 text-center text-2xl font-bold text-marino">AgriMind AI</h1>
+        <p class="mb-6 mt-1 text-center text-sm text-tinta-suave">Tus parcelas y su estado de riego</p>
+
+        <div role="tablist" aria-label="Acceso" class="mb-6 grid grid-cols-2 gap-1 border-b border-borde">
+          <button type="button" id="auth-volver" role="tab" aria-controls="login" aria-selected="true" class="-mb-px border-b-2 border-esmeralda bg-transparent px-2 py-2.5 text-sm font-semibold text-esmeralda-osc">Iniciar sesión</button>
+          <button type="button" id="auth-cambiar" role="tab" aria-controls="registro" aria-selected="false" tabindex="-1" class="-mb-px border-b-2 border-transparent bg-transparent px-2 py-2.5 text-sm font-semibold text-tinta-suave">Crear cuenta</button>
+        </div>
+
+        <div id="login" role="tabpanel" aria-labelledby="auth-volver">
+          <form id="form-login" novalidate>
+            <label for="login-email">Correo electrónico</label>
+            <input id="login-email" type="email" required autocomplete="email">
+            <label for="login-password">Contraseña</label>
+            <input id="login-password" type="password" required minlength="6" autocomplete="current-password">
+            <button type="submit" class="btn primario mt-6 w-full">Entrar</button>
+          </form>
+        </div>
+
+        <div id="registro" role="tabpanel" aria-labelledby="auth-cambiar" hidden>
+          <form id="form-registro" novalidate>
+            <label for="registro-nombre">Nombre</label>
+            <input id="registro-nombre" type="text" maxlength="100" required autocomplete="name">
+            <label for="registro-email">Correo electrónico</label>
+            <input id="registro-email" type="email" required autocomplete="email">
+            <label for="registro-password">Contraseña</label>
+            <input id="registro-password" type="password" required minlength="6" autocomplete="new-password">
+            <button type="submit" class="btn primario mt-6 w-full">Crear cuenta</button>
+          </form>
+        </div>
+
+        <p id="auth-mensaje" class="mensaje" role="status" aria-live="polite"></p>
+        <p class="mb-0 mt-4 text-center text-xs text-tinta-suave">Tus datos son tuyos: puedes exportarlos a CSV cuando quieras.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISTA 3 · PANEL ----------------------------------------------------- -->
+  <section id="app" aria-labelledby="panel-titulo" class="flex-1" hidden>
+    <div class="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1>AgriMind AI</h1>
-          <p>Tus parcelas y su estado de riego</p>
+          <h1 id="panel-titulo" tabindex="-1" class="m-0 text-3xl font-bold tracking-tight text-marino">Panel</h1>
+          <p class="mb-0 mt-1 text-tinta-suave">Estado de tus parcelas y alertas pendientes.</p>
         </div>
       </div>
-      <ul class="resumen" aria-label="Resumen de parcelas">
-        <li><strong id="n-total">0</strong> parcelas</li>
-        <li class="r-verde"><strong id="n-verde">0</strong> en verde</li>
-        <li class="r-amarillo"><strong id="n-amarillo">0</strong> en amarillo</li>
-        <li class="r-rojo"><strong id="n-rojo">0</strong> en rojo</li>
-        <li class="r-alerta"><strong id="n-alertas">0</strong> alertas activas</li>
-      </ul>
-      <div class="sesion">
-        <span>Hola, <strong id="nombre-usuario">Agricultor</strong></span>
-        <button type="button" id="btn-logout" class="btn secundario pequeno">Cerrar sesión</button>
-      </div>
-    </header>
 
-    <section class="panel alertas" aria-labelledby="titulo-alertas">
-      <div class="listado-cabecera">
-        <h2 id="titulo-alertas">Alertas activas</h2>
-        <span id="n-alertas-panel" class="conteo" aria-hidden="true">0</span>
-      </div>
-      <p id="alertas-mensaje" class="mensaje" role="status" aria-live="polite"></p>
-      <ul id="lista-alertas" class="lista-alertas"></ul>
-      <p id="alertas-vacio" class="vacio">Sin alertas activas. Las lecturas crearán las que hagan falta.</p>
-    </section>
+      <dl class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div class="rounded border border-borde bg-white px-4 py-3">
+          <dt class="text-sm text-tinta-suave">Parcelas</dt>
+          <dd id="n-total" class="m-0 text-2xl font-bold text-marino">0</dd>
+        </div>
+        <div class="rounded border border-borde bg-white px-4 py-3">
+          <dt class="text-sm text-tinta-suave">En verde</dt>
+          <dd id="n-verde" class="m-0 text-2xl font-bold text-verde-osc">0</dd>
+        </div>
+        <div class="rounded border border-borde bg-white px-4 py-3">
+          <dt class="text-sm text-tinta-suave">En amarillo</dt>
+          <dd id="n-amarillo" class="m-0 text-2xl font-bold text-amarillo-osc">0</dd>
+        </div>
+        <div class="rounded border border-borde bg-white px-4 py-3">
+          <dt class="text-sm text-tinta-suave">En rojo</dt>
+          <dd id="n-rojo" class="m-0 text-2xl font-bold text-rojo-osc">0</dd>
+        </div>
+        <div class="rounded border border-borde bg-white px-4 py-3">
+          <dt class="text-sm text-tinta-suave">Alertas activas</dt>
+          <dd id="n-alertas" class="m-0 text-2xl font-bold text-rojo-osc">0</dd>
+        </div>
+      </dl>
 
-    <main class="contenido">
-      <section class="panel formulario" aria-labelledby="titulo-form">
-        <h2 id="titulo-form">Añadir parcela</h2>
-        <form id="form" novalidate>
-          <input type="hidden" id="id">
+      <section class="panel mb-6" aria-labelledby="titulo-alertas">
+        <div class="listado-cabecera">
+          <h2 id="titulo-alertas" class="m-0">Alertas activas</h2>
+          <span id="n-alertas-panel" class="conteo" aria-hidden="true">0</span>
+        </div>
+        <p id="alertas-mensaje" class="mensaje" role="status" aria-live="polite"></p>
+        <ul id="lista-alertas" class="m-0 list-none p-0"></ul>
+        <p id="alertas-vacio" class="vacio">Sin alertas activas. Las lecturas crearán las que hagan falta.</p>
+      </section>
 
-          <label for="nombre">Nombre</label>
-          <input id="nombre" type="text" maxlength="100" required autocomplete="off">
+      <main class="grid items-start gap-6 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+        <section class="panel lg:sticky lg:top-24" aria-labelledby="titulo-form">
+          <h2 id="titulo-form">Añadir parcela</h2>
+          <form id="form" novalidate>
+            <input type="hidden" id="id">
 
-          <label for="cultivo">Cultivo</label>
-          <input id="cultivo" type="text" maxlength="100" required autocomplete="off">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" maxlength="100" required autocomplete="off">
 
-          <div class="fila">
-            <div>
-              <label for="superficie">Superficie (ha)</label>
-              <input id="superficie" type="number" min="0.01" step="0.01" required>
-            </div>
-            <div>
-              <label for="humedad">Humedad del suelo (%)</label>
-              <input id="humedad" type="number" min="0" max="100" step="0.1" required>
-            </div>
-          </div>
+            <label for="cultivo">Cultivo</label>
+            <input id="cultivo" type="text" maxlength="100" required autocomplete="off">
 
-          <fieldset class="grupo">
-            <legend>Ubicación (opcional)</legend>
             <div class="fila">
               <div>
-                <label for="latitud">Latitud</label>
-                <input id="latitud" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="37.7694">
+                <label for="superficie">Superficie (ha)</label>
+                <input id="superficie" type="number" min="0.01" step="0.01" required>
               </div>
               <div>
-                <label for="longitud">Longitud</label>
-                <input id="longitud" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="-3.7904">
+                <label for="humedad">Humedad del suelo (%)</label>
+                <input id="humedad" type="number" min="0" max="100" step="0.1" required>
               </div>
             </div>
-            <p class="ayuda">Usa punto decimal. La ubicación permitirá consultar el tiempo de cada parcela.</p>
-          </fieldset>
 
-          <label for="estado">Estado (calculado)</label>
-          <select id="estado" disabled>
-            <option value="verde">Verde: todo en orden</option>
-            <option value="amarillo">Amarillo: vigilar</option>
-            <option value="rojo">Rojo: actuar ya</option>
-          </select>
-          <p class="ayuda">El semáforo se calcula solo con la humedad de cada lectura.</p>
+            <fieldset class="grupo">
+              <legend>Ubicación (opcional)</legend>
+              <div class="fila">
+                <div>
+                  <label for="latitud">Latitud</label>
+                  <input id="latitud" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="37.7694">
+                </div>
+                <div>
+                  <label for="longitud">Longitud</label>
+                  <input id="longitud" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="-3.7904">
+                </div>
+              </div>
+              <p class="ayuda">Usa punto decimal. La ubicación permitirá consultar el tiempo de cada parcela.</p>
+            </fieldset>
 
-          <label for="notas">Notas</label>
-          <textarea id="notas" rows="3"></textarea>
+            <label for="estado">Estado (calculado)</label>
+            <select id="estado" disabled>
+              <option value="verde">Verde: todo en orden</option>
+              <option value="amarillo">Amarillo: vigilar</option>
+              <option value="rojo">Rojo: actuar ya</option>
+            </select>
+            <p class="ayuda">El semáforo se calcula solo con la humedad de cada lectura.</p>
 
-          <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+            <label for="notas">Notas</label>
+            <textarea id="notas" rows="3"></textarea>
 
-          <div class="acciones">
-            <button type="submit" id="btn-guardar" class="btn primario">Añadir parcela</button>
-            <button type="button" id="btn-cancelar" class="btn secundario" hidden>Cancelar</button>
+            <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+
+            <div class="acciones">
+              <button type="submit" id="btn-guardar" class="btn primario">Añadir parcela</button>
+              <button type="button" id="btn-cancelar" class="btn secundario" hidden>Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel" aria-labelledby="titulo-lista">
+          <div class="listado-cabecera">
+            <h2 id="titulo-lista">Parcelas</h2>
+            <div class="acciones">
+              <button type="button" id="btn-exportar-parcelas" class="btn secundario pequeno">Exportar CSV</button>
+              <button type="button" id="btn-ejemplos" class="btn exemplo pequeno">Cargar parcelas de ejemplo</button>
+            </div>
           </div>
-        </form>
-      </section>
-
-      <section class="panel listado" aria-labelledby="titulo-lista">
-        <div class="listado-cabecera">
-          <h2 id="titulo-lista">Parcelas</h2>
-          <div class="acciones">
-            <button type="button" id="btn-exportar-parcelas" class="btn secundario pequeno">Exportar CSV</button>
-            <button type="button" id="btn-ejemplos" class="btn ejemplo">Cargar parcelas de ejemplo</button>
+          <div class="tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Cultivo</th>
+                  <th class="num">Superficie</th>
+                  <th class="num">Humedad</th>
+                  <th class="num">Ubicación</th>
+                  <th>Estado</th>
+                  <th>Notas</th>
+                  <th><span class="solo-lectores">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
           </div>
-        </div>
-        <div class="tabla-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Cultivo</th>
-                <th class="num">Superficie</th>
-                <th class="num">Humedad</th>
-                <th class="num">Ubicación</th>
-                <th>Estado</th>
-                <th>Notas</th>
-                <th><span class="solo-lectores">Acciones</span></th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <p id="vacio" class="vacio" hidden>Aún no hay parcelas. Añade la primera o carga las parcelas de ejemplo.</p>
-      </section>
-    </main>
-  </div>
+          <p id="vacio" class="vacio" hidden>Aún no hay parcelas. Añade la primera o carga las parcelas de ejemplo.</p>
+        </section>
+      </main>
+    </div>
+  </section>
 
   <dialog id="dialog-lectura" class="dialogo-lectura" aria-labelledby="lectura-titulo">
     <div class="dialogo-cabecera">
@@ -217,6 +328,17 @@
       <p id="historial-mensaje" class="mensaje" role="status" aria-live="polite"></p>
     </div>
   </dialog>
+
+  <footer class="mt-auto border-t border-borde bg-white">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-tinta-suave sm:px-6 lg:px-8">
+      <p class="m-0">AgriMind AI es una aplicación de agricultura de precisión del proyecto T2-01. Tus datos permanecen en tu cuenta.</p>
+      <nav aria-label="Navegación del pie" class="flex flex-wrap gap-4">
+        <a data-nav="inicio" href="#/inicio" class="text-marino no-underline hover:underline">Inicio</a>
+        <a data-nav="app" href="#/panel" hidden class="text-marino no-underline hover:underline">Panel</a>
+        <a data-nav="auth" href="#/acceso" class="text-marino no-underline hover:underline">Acceso</a>
+      </nav>
+    </div>
+  </footer>
 
   <script type="module" src="/src/main.js"></script>
 </body>
