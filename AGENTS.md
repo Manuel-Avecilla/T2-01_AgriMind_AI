@@ -1,92 +1,36 @@
 # AgriMind AI
 
-Simple Node/Express + PostgreSQL app (Docker & Docker Compose) for managing parcels (CRUD).
+App de agricultura de precisión: **Vite + JavaScript vanilla + Tailwind 4 + Supabase**, desplegada en Vercel. `README.md` está desactualizado (describe la versión antigua Express/Postgres/Docker con `public/`): en código, manda `package.json` y `src/`.
 
-## Quick commands
+## Comandos
 
-- `docker compose up --build` – start app + PostgreSQL (app on port 3000, DB at `localhost:5432`)
-- `docker compose down` – stop containers (data kept in the `pgdata` volume)
-- `docker compose down -v` – stop **and remove** the Postgres volume (wipes sample data)
-- `npm start` – run `node server.js` locally (DB reachable via default env vars)
-- `npm run dev` – **not defined**; use `docker compose up --build` instead.
+- `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm preview` (`packageManager: pnpm@9.15.9`, ESM). No hay scripts de test, lint ni typecheck; `dist/` es generado y está ignorado.
+- Si pnpm/npm no están en el PATH de la sesión, el build funciona con `node node_modules/vite/bin/vite.js build`.
+- Copiar `.env.example` a `.env` con `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`; `src/supabaseClient.js` lanza error si faltan. Solo claves públicas: nunca `service_role` ni una key de modelo con prefijo `VITE_`.
 
-## Environment
+## Arranque y Rutas
 
-Default database credentials (overridable via env):
+- `index.html` en la raíz es la fuente (carga `/src/main.js`); `dist/` es solo salida de Vite. Ya no existen `server.js`, `Dockerfile` ni endpoints `/api/*` propios.
+- `src/main.js` resuelve la sesión con `getSession()` antes de pintar para evitar parpadeo, ignora el `INITIAL_SESSION` posterior del listener y serializa los cambios de sesión en una cola. No dupliques ese flujo al tocar autenticación.
+- Rutas por hash (`src/router.js`): `#/inicio`, `#/acceso`, `#/panel` y `#/acceso?tab=registro`. Sin sesión, `#/panel` redirige a acceso; con sesión, acceso redirige a panel. Las vistas permanecen ocultas hasta conocer la sesión.
+- En desarrollo `window.supabase` queda expuesto a propósito para probar login desde la consola; no existe en producción.
 
-| Variable | Default |
-|---|---|
-| `DB_HOST` | `localhost` |
-| `DB_PORT` | `5432` |
-| `DB_USER` | `agrimind` |
-| `DB_PASSWORD` | `agrimind_pass` |
-| `DB_NAME` | `agrimind` |
+## Datos (Supabase)
 
-## Project layout
+- Única capa de datos es supabase-js. Tablas `profiles`, `parcelas`, `lecturas`, `alertas`, con RLS por `auth.uid()`; `user_id` usa `default auth.uid()` y no se envía desde el cliente. Toda tabla nueva necesita RLS + políticas + GRANTs explícitos (ver `supabase/schema.sql`, idempotente).
+- No meter datos de ejemplo en SQL: los inserta el botón F11 desde `src/datosEjemplo.js`.
+- Al modificar el esquema, pasar los advisores de seguridad de Supabase; la anon key es segura solo mientras RLS esté activo.
 
-```
-agrimind/
-├── AGENTS.md          # this file — agent rules (see below)
-├── opencode.json      # MCPs / plugins (supabase, Vercel)
-├── package.json       # name agrimind-parcelas v1.0.0, scripts: start
-├── server.js          # Express API (GET/POST/PUT/DELETE `/api/parcelas`) + static files from `public/`
-├── db/init.sql        # creates `parcelas` table + inserts three example rows
-├── Dockerfile         # FROM node:20-alpine, npm install --omit=dev, COPY, EXPOSE 3000, CMD ["node","server.js"]
-├── docker-compose.yml # services: db (postgres:16-alpine) and app (ports 3000:3000)
-└── public/
-    ├── index.html     # single-page form + list
-    ├── styles.css     # CSS variables, table styling, buttons
-    └── app.js         # ES module UI: fetch API wrapper, pintar(), cargar(), editar/borrar
-```
+## Semáforo y alertas
 
-## Data model (`db/init.sql`)
+- `evaluarParcela()` en `src/alertas.js` es pura; sus umbrales están en `UMBRALES` (20/30/70/80). Si los cambias, actualiza también los tokens de color de `src/styles.css` y las franjas `bandasUmbral` en `src/lecturas.js`.
+- Guardar lectura (`src/lecturas.js`): insert en `lecturas` → update de `humedad_suelo`/`estado` en `parcelas` → `sincronizarAlerta()`. Hay un índice único parcial `(parcela_id, tipo) where estado = 'activa'`; el código maneja el error `23505` actualizando la alerta existente. No lo elimines: cubre dobles clics y pestañas concurrentes.
+- `evaluarParcela` ya acepta `prevision.probabilidadLluvia24h` (lluvia ≥ 60 % cambia el mensaje de humedad baja), pero la Fase 6 (Open-Meteo) aún no está implementada: no existe `src/clima.js`.
+- Los CSV se generan en el cliente con BOM, separador `;` y comillas dobles para Excel en español; conserva ese formato.
 
-```sql
-CREATE TABLE IF NOT EXISTS parcelas (
-  id            SERIAL PRIMARY KEY,
-  nombre        VARCHAR(100) NOT NULL,
-  cultivo       VARCHAR(100) NOT NULL,
-  superficie_ha NUMERIC(8,2) NOT NULL CHECK (superficie_ha > 0),
-  humedad_suelo NUMERIC(5,2) NOT NULL CHECK (humedad_suelo BETWEEN 0 AND 100),
-  estado        VARCHAR(10) NOT NULL DEFAULT 'verde' CHECK (estado IN ('verde','amarillo','rojo')),
-  notas         TEXT NOT NULL DEFAULT ''
-);
-INSERT INTO parcelas (nombre, cultivo, superficie_ha, humedad_suelo, estado, notas) VALUES
-  ('Parcela 1', 'Olivar',   6.50, 41.0, 'verde',    'Riego programado con normalidad.'),
-  ('Parcela 2', 'Girasol', 3.20, 27.5, 'amarillo', 'Humedad en descenso, vigilar esta semana.'),
-  ('Parcela 3', 'Trigo',    8.00, 14.0, 'rojo',     'Estrés hídrico: regar cuanto antes.');
-```
+## Convenciones y operación
 
-## Things an agent should **avoid**
-
-- Do **not** add `service_role` or a real `LLM_API_KEY` to the repo or `.env` committed to Git.
-- Do **not** modify `Dockerfile` to install dev dependencies (`--omit=dev` is intentional).
-- Do **not** assume a test runner or linter is configured; only `npm start` script exists.
-- Do **not** edit `public/` CSS/HTML without first confirming `server.js` still serves the folder unchanged.
-- Do **not** insert raw SQL that bypasses the `parcelas` schema in `init.sql` without also updating the sample-data INSERT.
-
-## Prompt style for future sessions
-
-> "Lee AGENTS.md y `PLAN_MIGRACION_VERCEL_SUPABASE.md`. Vamos a hacer solo la **Fase N**. Primero propón un plan breve y espera mi confirmación. Después implementa paso a paso y dime cómo probar cada paso."
-
-## Phase workflow (from PLAN_MIGRACION_VERCEL_SUPABASE.md)
-
-1. **Phase 0 – Preparation**: create GitHub/Supabase/Vercel accounts, install OpenCode + free provider MCPs, create repo with `.gitignore` (include `.env`) and `AGENTS.md`.
-2. **Phase 1 – Supabase**: create project in Supabase (EU region), run `supabase/schema.sql`, enable email/password auth, copy URL/key into `.env` local.
-3. **Phase 2 – Frontend**: init Vite (JS vanilla), move `public/` → `src/`, create `supabaseClient.js` with `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`, replace `fetch('/api/parcelas')` calls with `supabase.from('parcelas')` select/insert/update/delete, add lat/long fields and F11 "Cargar parcelas de ejemplo".
-4. **Phase 3 – Auth**: build login/register page, `supabase.auth.onAuthStateChange`, logout, re-enable RLS if disabled.
-5. **Phase 4 – First Vercel deploy**: push to GitHub, import to Vercel (detects Vite), add env vars in Settings → Environment Variables, point Supabase URL in Auth → URL Configuration to Vercel Site URL.
-6. **Phase 5 – Business features**: `lecturas.js` (record humidity/pH), `alertas.js` (`evaluarParcela` + alert flow), summary panel, CSV export.
-7. **Phase 6 – Climate**: `clima.js` querying Open-Meteo, show forecast + irrigation recommendation.
-8. **Phase 7 – Optional**: IA assistant (`api/asistente.js`), Leaflet map, voice button.
-
-## Acceptance checklist
-
-- [ ] New user can register, log in, log out on the Vercel URL.
-- [ ] Two distinct users see each other's data? (RLS check)
-- [ ] Create / edit / delete parcels work.
-- [ ] Recording a humidity reading changes state and generates/resolves alerts with cause.
-- [ ] Summary panel shows counts per status and active alerts.
-- [ ] At least one parcel shows weather forecast and a watering recommendation.
-- [ ] Data export to CSV works.
-- [ ] No secrets or real passwords in the repo or slides.
+- Textos de interfaz en español; nombres de funciones y variables en español, coherentes con `src/`. Sin frameworks de UI: módulos ES en `src/`, estilos en `src/styles.css` (Tailwind 4 + tokens propios).
+- Cambios pequeños, un archivo o función por petición; no reescribir lo que ya funciona. El plan por fases está en `docs/PLAN_MIGRACION_VERCEL_SUPABASE.md` (estado actual: Fase 5.2). Estilo de trabajo: plan breve → confirmación → implementación → cómo probarlo → commit por fase.
+- `opencode.json` define el plugin DCP y los MCPs remotos Supabase (limitado por `project_ref` y `features`) y Vercel; las skills viven en `.opencode/skills/`. No instalar MCPs/skills que no se vayan a usar: el enunciado lo exige.
+- Despliegue sin `vercel.json`: Vercel detecta Vite. Definir las dos variables `VITE_*` en Vercel y registrar la URL resultante como Site URL y Redirect URL en Supabase Auth. El plan gratuito pausa proyectos inactivos: reactivar antes de una demo.
