@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { borrarParcela, insertarEjemplos } from '../datos/parcelas.js';
 import { AlertasActivas } from './AlertasActivas.jsx';
-import { DialogoLectura } from './DialogoLectura.jsx';
+import { DialogoHistorial } from './DialogoHistorial.jsx';
+import { DialogoMedir } from './DialogoMedir.jsx';
 import { FormularioParcela } from './FormularioParcela.jsx';
 import { ListaParcelas } from './ListaParcelas.jsx';
 import { Resumen } from './Resumen.jsx';
@@ -18,10 +19,10 @@ export function Panel({
 }) {
   const [editando, setEditando] = useState(null);
   const [aviso, setAviso] = useState({ texto: '', esError: false });
-  const [dialogo, setDialogo] = useState(null); // { parcelaId, modo }
+  const [dialogo, setDialogo] = useState(null); // { parcelaId, tipo }
 
   // La parcela se deriva del listado: tras guardar, onCambio() actualiza el
-  // diálogo con la humedad y el estado ya persistidos.
+  // estado del panel antes de cerrar el modal.
   const parcelaDialogo = dialogo
     ? parcelas.find((parcela) => parcela.id === dialogo.parcelaId) ?? null
     : null;
@@ -32,8 +33,8 @@ export function Panel({
     setAviso({ texto, esError });
   }
 
-  function abrirDialogo(parcela, modo) {
-    setDialogo({ parcelaId: parcela.id, modo });
+  function abrirDialogo(parcela, tipo) {
+    setDialogo({ parcelaId: parcela.id, tipo });
   }
 
   // Una sesión distinta no debe dejar el formulario ni el diálogo de una
@@ -108,12 +109,18 @@ export function Panel({
         </main>
 
         {dialogo && parcelaDialogo && (
-          <DialogoLectura
-            parcela={parcelaDialogo}
-            modo={dialogo.modo}
-            onCerrar={cerrarDialogo}
-            onCambio={recargar}
-          />
+          dialogo.tipo === 'medir' ? (
+            <DialogoMedir
+              parcela={parcelaDialogo}
+              onCerrar={cerrarDialogo}
+              onCambio={recargar}
+            />
+          ) : (
+            <DialogoHistorial
+              parcela={parcelaDialogo}
+              onCerrar={cerrarDialogo}
+            />
+          )
         )}
       </div>
     </section>

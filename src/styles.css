@@ -223,10 +223,15 @@
   .auth-caja {
     @apply w-full max-w-md rounded-xl border border-borde bg-white p-5 sm:p-8;
   }
-  .dialogo-lectura {
-    @apply max-h-[min(92vh,900px)] w-[min(100%_-_1rem,720px)] overflow-y-auto rounded-xl border border-borde bg-white p-4 text-tinta sm:w-[min(100%_-_2rem,720px)] sm:p-6;
+  /* Tailwind 4 resetea margin a 0 en todos los elementos; sin m-auto el
+     diálogo nativo se queda pegado a la esquina superior izquierda. */
+  .dialogo {
+    @apply inset-0 m-auto max-h-[min(92vh,900px)] w-[min(100%_-_1rem,560px)] overflow-y-auto rounded-xl border border-borde bg-white p-4 text-tinta sm:w-[min(100%_-_2rem,560px)] sm:p-6;
   }
-  .dialogo-lectura::backdrop {
+  .dialogo-historial {
+    @apply w-[min(100%_-_1rem,820px)] sm:w-[min(100%_-_2rem,820px)];
+  }
+  .dialogo::backdrop {
     background: rgba(15, 42, 71, 0.62);
   }
   .dialogo-cabecera {
@@ -236,7 +241,7 @@
     @apply m-0 text-xl text-marino;
   }
   .historial {
-    @apply mt-6 border-t border-borde pt-5;
+    @apply mt-4;
   }
   .historial h3 {
     @apply m-0 text-base text-marino;
