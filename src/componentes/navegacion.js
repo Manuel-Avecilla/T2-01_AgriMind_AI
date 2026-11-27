@@ -14,3 +14,11 @@ export function visibleNav(nav, sesion, sesionConocida) {
   if (nav === 'auth') return !sesion;
   return true;
 }
+
+export function claseNav(activo) {
+  return `inline-flex min-h-11 items-center rounded-md px-3 py-2 text-sm font-semibold no-underline transition-colors ${
+    activo
+      ? 'bg-esmeralda-suave text-esmeralda-osc'
+      : 'text-marino hover:bg-papel hover:text-marino'
+  }`;
+}

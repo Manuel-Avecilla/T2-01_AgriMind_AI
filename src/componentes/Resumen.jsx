@@ -25,12 +25,18 @@ export function Resumen({ parcelas, numeroAlertas }) {
 
   return (
     <dl className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      {TARJETAS.map(({ id, texto, color }) => (
-        <div key={id} className="rounded border border-borde bg-white px-4 py-3">
-          <dt className="text-sm text-tinta-suave">{texto}</dt>
-          <dd id={id} className={`m-0 text-2xl font-bold ${color}`}>{conteos[id]}</dd>
-        </div>
-      ))}
+      {TARJETAS.map(({ id, texto, color }, indice) => {
+        const esUltima = indice === TARJETAS.length - 1;
+        return (
+          <div
+            key={id}
+            className={`rounded-xl border border-borde bg-white px-4 py-4 ${esUltima ? 'col-span-2 sm:col-span-1' : ''}`}
+          >
+            <dt className="text-sm text-tinta-suave">{texto}</dt>
+            <dd id={id} className={`m-0 mt-1 text-2xl font-bold tracking-tight ${color}`}>{conteos[id]}</dd>
+          </div>
+        );
+      })}
     </dl>
   );
 }

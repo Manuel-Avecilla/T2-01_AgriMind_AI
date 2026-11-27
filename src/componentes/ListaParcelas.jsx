@@ -7,16 +7,16 @@ export function ListaParcelas({ parcelas, editandoId, onEditar, onBorrar, onMedi
     <section className="panel" aria-labelledby="titulo-lista">
       <div className="listado-cabecera">
         <h2 id="titulo-lista">Parcelas</h2>
-        <div className="acciones">
+        <div className="acciones w-full sm:w-auto">
           <button
             type="button"
             id="btn-exportar-parcelas"
-            className="btn secundario pequeno"
+            className="btn secundario pequeno flex-1 sm:flex-none"
             onClick={() => exportarParcelas(parcelas)}
           >
             Exportar CSV
           </button>
-          <button type="button" id="btn-ejemplos" className="btn exemplo pequeno" onClick={onEjemplos}>
+          <button type="button" id="btn-ejemplos" className="btn ejemplo pequeno flex-1 sm:flex-none" onClick={onEjemplos}>
             Cargar parcelas de ejemplo
           </button>
         </div>

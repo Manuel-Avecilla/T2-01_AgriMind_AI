@@ -222,7 +222,7 @@ export function Acceso({ visible, tabSolicitado }) {
 
   return (
     <section id="auth" aria-labelledby="auth-titulo" className="flex-1" hidden={!visible}>
-      <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-14 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-10 sm:px-6 sm:py-14">
         <div className="auth-caja">
           <svg className="mx-auto mb-3 h-12 w-12" aria-hidden="true" focusable="false" viewBox="0 0 48 48">
             <path d="M27.5 4.5c-8.7 0-15.8 7-15.8 15.6 0 3.4 1.1 6.6 3 9.2v6.2c0 1.9 1.5 3.4 3.4 3.4h12.4V4.5h-.8Z" fill="#0f2a47"/>
@@ -251,7 +251,7 @@ export function Acceso({ visible, tabSolicitado }) {
                 tabIndex={tab === id ? 0 : -1}
                 onClick={() => seleccionarTab(id, true)}
                 onKeyDown={(evento) => alPulsarTab(evento, indice)}
-                className={`-mb-px border-b-2 bg-transparent px-2 py-2.5 text-sm font-semibold ${tab === id ? 'border-esmeralda text-esmeralda-osc' : 'border-transparent text-tinta-suave'}`}
+                className={`-mb-px min-h-11 border-b-2 bg-transparent px-2 py-2.5 text-sm font-semibold transition-colors ${tab === id ? 'border-esmeralda text-esmeralda-osc' : 'border-transparent text-tinta-suave hover:text-marino'}`}
               >
                 {texto}
               </button>

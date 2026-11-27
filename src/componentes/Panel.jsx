@@ -75,11 +75,11 @@ export function Panel({
 
   return (
     <section id="app" aria-labelledby="panel-titulo" className="flex-1" hidden={!visible} aria-busy={cargando || undefined}>
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+      <div className="mx-auto max-w-7xl px-4 pb-14 pt-6 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
           <div>
-            <h1 id="panel-titulo" tabIndex={-1} className="m-0 text-3xl font-bold tracking-tight text-marino">Panel</h1>
-            <p className="mb-0 mt-1 text-tinta-suave">Estado de tus parcelas y alertas pendientes.</p>
+            <h1 id="panel-titulo" tabIndex={-1} className="m-0 text-2xl font-bold tracking-tight text-marino sm:text-3xl">Panel</h1>
+            <p className="mb-0 mt-1 text-sm text-tinta-suave sm:text-base">Estado de tus parcelas y alertas pendientes.</p>
           </div>
         </div>
 

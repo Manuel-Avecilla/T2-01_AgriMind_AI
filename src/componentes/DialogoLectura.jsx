@@ -103,11 +103,14 @@ export function DialogoLectura({ parcela, modo, onCerrar, onCambio }) {
   return (
     <dialog ref={dialogoRef} id="dialog-lectura" className="dialogo-lectura" aria-labelledby="lectura-titulo">
       <div className="dialogo-cabecera">
-        <h2 id="lectura-titulo">Medir {parcela.nombre}</h2>
+        <div className="min-w-0">
+          <p className="m-0 text-xs font-semibold uppercase tracking-wide text-tinta-suave">Parcela</p>
+          <h2 id="lectura-titulo" className="truncate">Medir {parcela.nombre}</h2>
+        </div>
         <button
           type="button"
           id="btn-cerrar-lectura"
-          className="btn secundario pequeno"
+          className="btn secundario pequeno shrink-0"
           aria-label="Cerrar ventana"
           onClick={() => dialogoRef.current?.close()}
         >
@@ -162,11 +165,11 @@ export function DialogoLectura({ parcela, modo, onCerrar, onCambio }) {
           {mensaje.texto}
         </p>
 
-        <div className="acciones">
+        <div className="acciones mt-4">
           <button
             type="submit"
             id="btn-guardar-lectura"
-            className="btn primario"
+            className="btn primario w-full sm:w-auto"
             disabled={guardando}
             aria-busy={guardando || undefined}
           >
@@ -175,7 +178,7 @@ export function DialogoLectura({ parcela, modo, onCerrar, onCambio }) {
           <button
             type="button"
             id="btn-exportar-csv"
-            className="btn secundario"
+            className="btn secundario w-full sm:w-auto"
             onClick={() => exportarLecturas(parcela, lecturas)}
           >
             Exportar CSV de esta parcela

@@ -33,15 +33,17 @@ export function AlertasActivas({ alertas, errorCarga, recargar }) {
   return (
     <section className="panel mb-6" aria-labelledby="titulo-alertas">
       <div className="listado-cabecera">
-        <h2 id="titulo-alertas" className="m-0">Alertas activas</h2>
-        <span id="n-alertas-panel" className="conteo" aria-hidden="true">{alertas.length}</span>
+        <div className="flex items-center gap-3">
+          <h2 id="titulo-alertas" className="m-0">Alertas activas</h2>
+          <span id="n-alertas-panel" className="conteo" aria-hidden="true">{alertas.length}</span>
+        </div>
       </div>
       <p id="alertas-mensaje" className={`mensaje${esError ? ' error' : ''}`} role="status" aria-live="polite">{texto}</p>
       <ul id="lista-alertas" className="m-0 list-none p-0">
         {alertas.map((alerta) => (
           <li key={alerta.id} className={`alerta-item nivel-${alerta.nivel}`}>
             <div className="alerta-cabecera">
-              <strong>{nombreParcela(alerta)}</strong>
+              <strong className="text-base">{nombreParcela(alerta)}</strong>
               <span className={`insignia ${alerta.nivel}`}>
                 {ETIQUETAS_NIVEL[alerta.nivel] ?? alerta.nivel}
               </span>

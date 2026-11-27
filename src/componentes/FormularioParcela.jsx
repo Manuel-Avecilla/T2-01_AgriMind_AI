@@ -193,11 +193,11 @@ export function FormularioParcela({ editando, onCambiarEditando, aviso, onAvisar
 
         <p id="mensaje" className={`mensaje${esError ? ' error' : ''}`} role="status" aria-live="polite">{texto}</p>
 
-        <div className="acciones">
-          <button type="submit" id="btn-guardar" className="btn primario">
+        <div className="acciones mt-4">
+          <button type="submit" id="btn-guardar" className="btn primario w-full sm:w-auto">
             {editando ? 'Guardar cambios' : 'Añadir parcela'}
           </button>
-          <button type="button" id="btn-cancelar" className="btn secundario" hidden={!editando} onClick={cancelar}>
+          <button type="button" id="btn-cancelar" className="btn secundario w-full sm:w-auto" hidden={!editando} onClick={cancelar}>
             Cancelar
           </button>
         </div>

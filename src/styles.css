@@ -56,10 +56,10 @@
 --------------------------------------------------------------------------- */
 @layer components {
   .panel {
-    @apply min-w-0 rounded border border-borde bg-white p-5;
+    @apply min-w-0 rounded-xl border border-borde bg-white p-4 sm:p-5;
   }
   .panel h2 {
-    @apply mb-4 text-xl font-semibold leading-tight text-marino;
+    @apply mb-4 text-lg font-semibold leading-tight text-marino sm:text-xl;
   }
   .listado-cabecera {
     @apply mb-4 flex flex-wrap items-center justify-between gap-3;
@@ -84,14 +84,14 @@
     @apply border-sol bg-sol font-bold text-marino hover:border-sol-osc hover:bg-sol-osc;
   }
   .btn.pequeno {
-    @apply min-h-0 px-3 py-1.5 text-sm;
+    @apply min-h-11 px-3 py-2 text-sm sm:min-h-0 sm:px-3 sm:py-1.5;
   }
   .btn:disabled {
     @apply cursor-not-allowed opacity-60;
   }
 
   .insignia {
-    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-sm font-semibold;
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold sm:px-3 sm:text-sm;
   }
   .insignia::before {
     content: "";
@@ -112,7 +112,7 @@
   }
 
   .alerta-item {
-    @apply relative grid gap-1.5 border-b border-borde py-3 pl-4 pr-2 last:border-b-0;
+    @apply relative grid gap-2 border-b border-borde py-4 pl-4 pr-1 last:border-b-0 sm:pr-2;
   }
   .alerta-item::before {
     content: "";
@@ -140,7 +140,7 @@
     @apply text-marino-2;
   }
   .alerta-acciones {
-    @apply mt-1.5 flex flex-wrap gap-2;
+    @apply mt-2 flex flex-wrap gap-2;
   }
 
   .mensaje {
@@ -165,7 +165,7 @@
   input,
   select,
   textarea {
-    @apply min-h-11 w-full rounded border border-borde bg-white px-3 py-2 font-sans text-base text-tinta placeholder:text-tinta-suave;
+    @apply min-h-11 w-full rounded-lg border border-borde bg-white px-3 py-2 font-sans text-base text-tinta placeholder:text-tinta-suave;
   }
   textarea {
     @apply resize-y;
@@ -210,17 +210,17 @@
     @apply max-w-[20ch] text-sm text-tinta-suave;
   }
   td.botones {
-    @apply flex gap-1.5 whitespace-nowrap;
+    @apply flex flex-wrap gap-2 whitespace-nowrap;
   }
   tbody tr.editando {
     @apply bg-esmeralda-suave;
   }
 
   .auth-caja {
-    @apply w-full max-w-md rounded border border-borde bg-white p-8;
+    @apply w-full max-w-md rounded-xl border border-borde bg-white p-5 sm:p-8;
   }
   .dialogo-lectura {
-    @apply max-h-[min(90vh,900px)] w-[min(100%_-_2rem,720px)] overflow-y-auto rounded-lg border border-borde bg-white p-6 text-tinta;
+    @apply max-h-[min(92vh,900px)] w-[min(100%_-_1rem,720px)] overflow-y-auto rounded-xl border border-borde bg-white p-4 text-tinta sm:w-[min(100%_-_2rem,720px)] sm:p-6;
   }
   .dialogo-lectura::backdrop {
     background: rgba(15, 42, 71, 0.62);
@@ -248,7 +248,7 @@
     display: none !important;
   }
   .boot-caja {
-    @apply flex flex-col items-center gap-3 rounded border border-borde bg-white px-8 py-10 text-center;
+    @apply flex flex-col items-center gap-3 rounded-xl border border-borde bg-white px-6 py-8 text-center sm:px-8 sm:py-10;
   }
   .boot-logo {
     @apply h-12 w-12;
@@ -330,10 +330,13 @@
     @apply max-w-none;
   }
   td.botones {
-    @apply flex-wrap justify-end pt-2;
+    @apply mt-2 w-full flex-wrap justify-start gap-2 border-t border-borde pt-3;
+  }
+  td.botones .btn {
+    @apply min-h-11 flex-auto;
   }
   td.botones::before {
-    @apply mr-auto;
+    @apply mb-1 w-full;
   }
   .fila {
     @apply grid-cols-1;
