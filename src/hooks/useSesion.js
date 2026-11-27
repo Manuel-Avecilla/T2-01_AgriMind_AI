@@ -4,7 +4,7 @@ import {
   escucharCambiosAuth,
   obtenerNombre,
   obtenerSesionInicial,
-} from '../auth.js';
+} from '../datos/auth.js';
 
 const EVENTOS = ['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED', 'USER_UPDATED'];
 

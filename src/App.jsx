@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { iniciarFormulariosAuth, mostrarFormularioAuth } from './auth.js';
+import { Acceso } from './componentes/Acceso.jsx';
 import { Cabecera } from './componentes/Cabecera.jsx';
 import { Inicio } from './componentes/Inicio.jsx';
 import { Logo } from './componentes/Logo.jsx';
 import { Pie } from './componentes/Pie.jsx';
 import { useRuta } from './hooks/useRuta.js';
 import { useSesion } from './hooks/useSesion.js';
-import { HTML_ACCESO, HTML_DIALOGO, HTML_PANEL } from './vistasLegado.js';
+import { HTML_DIALOGO, HTML_PANEL } from './vistasLegado.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -27,7 +27,6 @@ function limpiarPanel() {
 export default function App() {
   const { sesion, sesionConocida, nombre, cerrarSesion } = useSesion();
   const ruta = useRuta({ sesion, sesionConocida });
-  const accesoRef = useRef(null);
   const panelRef = useRef(null);
   const modulosRef = useRef(Promise.resolve(null));
 
@@ -48,7 +47,6 @@ export default function App() {
         import('./parcelas.js'),
       ]);
       if (!vivo) return null;
-      iniciarFormulariosAuth();
       alertas.iniciarPanelAlertas();
       lecturas.iniciarLecturas({ onCambio: recargarPanel });
       parcelas.iniciarParcelas({ onCambio: recargarPanel });
@@ -63,22 +61,8 @@ export default function App() {
       const nodo = ref.current?.firstElementChild;
       if (nodo) nodo.hidden = !(sesionConocida && ruta.nombre === nombreVista);
     };
-    mostrar(accesoRef, 'acceso');
     mostrar(panelRef, 'panel');
   }, [ruta.nombre, sesionConocida]);
-
-  // ?tab=registro selecciona la pestaña del acceso sin mover el foco.
-  useEffect(() => {
-    if (!sesionConocida || ruta.nombre !== 'acceso') return;
-    let vivo = true;
-    (async () => {
-      const modulos = await modulosRef.current;
-      if (vivo && modulos) {
-        mostrarFormularioAuth(ruta.parametros.get('tab') === 'registro' ? 'registro' : 'login');
-      }
-    })();
-    return () => { vivo = false; };
-  }, [ruta.nombre, ruta.parametros, sesionConocida]);
 
   // Cada sesión aplicada recarga el panel; sin sesión se limpia como antes.
   useEffect(() => {
@@ -119,7 +103,13 @@ export default function App() {
 
       <Inicio sesion={sesion} sesionConocida={sesionConocida} ruta={ruta.nombre} />
 
-      <div className="contents" ref={accesoRef} dangerouslySetInnerHTML={{ __html: HTML_ACCESO }} />
+      <Acceso
+        visible={sesionConocida && ruta.nombre === 'acceso'}
+        tabSolicitado={ruta.nombre === 'acceso'
+          ? (ruta.parametros.get('tab') === 'registro' ? 'registro' : 'login')
+          : null}
+      />
+
       <div className="contents" ref={panelRef} dangerouslySetInnerHTML={{ __html: HTML_PANEL }} />
       <div className="contents" dangerouslySetInnerHTML={{ __html: HTML_DIALOGO }} />
 
