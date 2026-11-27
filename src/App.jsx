@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useRef } from 'react';
 import { Acceso } from './componentes/Acceso.jsx';
 import { Cabecera } from './componentes/Cabecera.jsx';
 import { Inicio } from './componentes/Inicio.jsx';
@@ -8,36 +7,11 @@ import { Pie } from './componentes/Pie.jsx';
 import { usePanel } from './hooks/usePanel.js';
 import { useRuta } from './hooks/useRuta.js';
 import { useSesion } from './hooks/useSesion.js';
-import { HTML_DIALOGO } from './vistasLegado.js';
 
 export default function App() {
   const { sesion, sesionConocida, nombre, cerrarSesion } = useSesion();
   const ruta = useRuta({ sesion, sesionConocida });
   const { parcelas, alertas, cargando, errorParcelas, errorAlertas, recargar } = usePanel({ sesion, sesionConocida });
-  const modulosRef = useRef(Promise.resolve(null));
-
-  // El diálogo de lecturas sigue siendo vanilla hasta la Fase 4: sus módulos
-  // capturan campos del DOM al cargarse, después de inyectar el markup.
-  useEffect(() => {
-    let vivo = true;
-    modulosRef.current = (async () => {
-      const lecturas = await import('./lecturas.js');
-      if (!vivo) return null;
-      lecturas.iniciarLecturas({ onCambio: recargar });
-      return lecturas;
-    })();
-    return () => { vivo = false; };
-  }, [recargar]);
-
-  const onMedir = useCallback(async (parcela) => {
-    const lecturas = await modulosRef.current;
-    await lecturas?.abrirRegistro(parcela);
-  }, []);
-
-  const onHistorial = useCallback(async (parcela) => {
-    const lecturas = await modulosRef.current;
-    await lecturas?.abrirHistorial(parcela);
-  }, []);
 
   return (
     <>
@@ -78,11 +52,7 @@ export default function App() {
         errorParcelas={errorParcelas}
         errorAlertas={errorAlertas}
         recargar={recargar}
-        onMedir={onMedir}
-        onHistorial={onHistorial}
       />
-
-      <div className="contents" dangerouslySetInnerHTML={{ __html: HTML_DIALOGO }} />
 
       <Pie sesion={sesion} sesionConocida={sesionConocida} ruta={ruta.nombre} />
     </>

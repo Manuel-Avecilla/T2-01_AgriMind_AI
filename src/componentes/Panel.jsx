@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { borrarParcela, insertarEjemplos } from '../datos/parcelas.js';
 import { AlertasActivas } from './AlertasActivas.jsx';
+import { DialogoLectura } from './DialogoLectura.jsx';
 import { FormularioParcela } from './FormularioParcela.jsx';
 import { ListaParcelas } from './ListaParcelas.jsx';
 import { Resumen } from './Resumen.jsx';
@@ -14,20 +15,33 @@ export function Panel({
   errorParcelas,
   errorAlertas,
   recargar,
-  onMedir,
-  onHistorial,
 }) {
   const [editando, setEditando] = useState(null);
   const [aviso, setAviso] = useState({ texto: '', esError: false });
+  const [dialogo, setDialogo] = useState(null); // { parcelaId, modo }
+
+  // La parcela se deriva del listado: tras guardar, onCambio() actualiza el
+  // diálogo con la humedad y el estado ya persistidos.
+  const parcelaDialogo = dialogo
+    ? parcelas.find((parcela) => parcela.id === dialogo.parcelaId) ?? null
+    : null;
+
+  const cerrarDialogo = useCallback(() => setDialogo(null), []);
 
   function avisar(texto, esError = false) {
     setAviso({ texto, esError });
   }
 
-  // Una sesión distinta no debe dejar el formulario editando una parcela ajena.
+  function abrirDialogo(parcela, modo) {
+    setDialogo({ parcelaId: parcela.id, modo });
+  }
+
+  // Una sesión distinta no debe dejar el formulario ni el diálogo de una
+  // parcela ajena abiertos.
   useEffect(() => {
     setEditando(null);
     setAviso({ texto: '', esError: false });
+    setDialogo(null);
   }, [sesion?.user?.id]);
 
   async function borrar(parcela) {
@@ -35,6 +49,7 @@ export function Panel({
     try {
       await borrarParcela(parcela.id);
       if (editando?.id === parcela.id) setEditando(null);
+      if (dialogo?.parcelaId === parcela.id) setDialogo(null);
       avisar(`Parcela «${parcela.nombre}» borrada.`);
       await recargar();
     } catch (error) {
@@ -87,10 +102,19 @@ export function Panel({
             onEditar={empezarEdicion}
             onBorrar={borrar}
             onEjemplos={ejemplos}
-            onMedir={onMedir}
-            onHistorial={onHistorial}
+            onMedir={(parcela) => abrirDialogo(parcela, 'medir')}
+            onHistorial={(parcela) => abrirDialogo(parcela, 'historial')}
           />
         </main>
+
+        {dialogo && parcelaDialogo && (
+          <DialogoLectura
+            parcela={parcelaDialogo}
+            modo={dialogo.modo}
+            onCerrar={cerrarDialogo}
+            onCambio={recargar}
+          />
+        )}
       </div>
     </section>
   );

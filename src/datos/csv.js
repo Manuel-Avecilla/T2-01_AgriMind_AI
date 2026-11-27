@@ -1,5 +1,7 @@
 // CSV compatible con Excel en español: BOM, separador ';' y comillas dobles.
 
+import { evaluarParcela } from './alertas.js';
+
 export function nombreArchivo(nombre) {
   return nombre.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -36,5 +38,18 @@ export function exportarParcelas(parcelas) {
       parcela.notas ?? '',
     ]),
     'parcelas'
+  );
+}
+
+export function exportarLecturas(parcela, lecturas) {
+  descargarCsv(
+    ['fecha', 'humedad_suelo_%', 'ph', 'estado'],
+    lecturas.map((lectura) => [
+      lectura.medido_en,
+      lectura.humedad_suelo,
+      lectura.ph ?? '',
+      evaluarParcela(lectura.humedad_suelo).estado,
+    ]),
+    `lecturas-${nombreArchivo(parcela.nombre)}`
   );
 }
