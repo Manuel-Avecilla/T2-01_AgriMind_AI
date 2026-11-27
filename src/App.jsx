@@ -3,82 +3,41 @@ import { Acceso } from './componentes/Acceso.jsx';
 import { Cabecera } from './componentes/Cabecera.jsx';
 import { Inicio } from './componentes/Inicio.jsx';
 import { Logo } from './componentes/Logo.jsx';
+import { Panel } from './componentes/Panel.jsx';
 import { Pie } from './componentes/Pie.jsx';
+import { usePanel } from './hooks/usePanel.js';
 import { useRuta } from './hooks/useRuta.js';
 import { useSesion } from './hooks/useSesion.js';
-import { HTML_DIALOGO, HTML_PANEL } from './vistasLegado.js';
-
-const $ = (id) => document.getElementById(id);
-
-function limpiarPanel() {
-  $('tbody').replaceChildren();
-  $('lista-alertas').replaceChildren();
-  for (const id of ['n-total', 'n-verde', 'n-amarillo', 'n-rojo', 'n-alertas', 'n-alertas-panel']) {
-    const nodo = $(id);
-    if (nodo) nodo.textContent = '0';
-  }
-  const vacio = $('vacio');
-  const alertasVacio = $('alertas-vacio');
-  if (vacio) vacio.hidden = false;
-  if (alertasVacio) alertasVacio.hidden = false;
-  if ($('dialog-lectura')?.open) $('dialog-lectura').close();
-}
+import { HTML_DIALOGO } from './vistasLegado.js';
 
 export default function App() {
   const { sesion, sesionConocida, nombre, cerrarSesion } = useSesion();
   const ruta = useRuta({ sesion, sesionConocida });
-  const panelRef = useRef(null);
+  const { parcelas, alertas, cargando, errorParcelas, errorAlertas, recargar } = usePanel({ sesion, sesionConocida });
   const modulosRef = useRef(Promise.resolve(null));
 
-  const recargarPanel = useCallback(async () => {
-    const modulos = await modulosRef.current;
-    if (!modulos) return;
-    await Promise.all([modulos.parcelas.recargarParcelas(), modulos.alertas.recargarAlertas()]);
-  }, []);
-
-  // Los módulos vanilla se importan después de inyectar el markup: parcelas.js
-  // captura campos del DOM en el momento de cargarse.
+  // El diálogo de lecturas sigue siendo vanilla hasta la Fase 4: sus módulos
+  // capturan campos del DOM al cargarse, después de inyectar el markup.
   useEffect(() => {
     let vivo = true;
     modulosRef.current = (async () => {
-      const [alertas, lecturas, parcelas] = await Promise.all([
-        import('./alertas.js'),
-        import('./lecturas.js'),
-        import('./parcelas.js'),
-      ]);
+      const lecturas = await import('./lecturas.js');
       if (!vivo) return null;
-      alertas.iniciarPanelAlertas();
-      lecturas.iniciarLecturas({ onCambio: recargarPanel });
-      parcelas.iniciarParcelas({ onCambio: recargarPanel });
-      return { alertas, parcelas };
+      lecturas.iniciarLecturas({ onCambio: recargar });
+      return lecturas;
     })();
     return () => { vivo = false; };
-  }, [recargarPanel]);
+  }, [recargar]);
 
-  // Las vistas puente se muestran con las mismas reglas del router anterior.
-  useEffect(() => {
-    const mostrar = (ref, nombreVista) => {
-      const nodo = ref.current?.firstElementChild;
-      if (nodo) nodo.hidden = !(sesionConocida && ruta.nombre === nombreVista);
-    };
-    mostrar(panelRef, 'panel');
-  }, [ruta.nombre, sesionConocida]);
+  const onMedir = useCallback(async (parcela) => {
+    const lecturas = await modulosRef.current;
+    await lecturas?.abrirRegistro(parcela);
+  }, []);
 
-  // Cada sesión aplicada recarga el panel; sin sesión se limpia como antes.
-  useEffect(() => {
-    if (!sesionConocida) return;
-    let vivo = true;
-    (async () => {
-      const modulos = await modulosRef.current;
-      if (!vivo || !modulos) return;
-      if (!sesion) {
-        limpiarPanel();
-        return;
-      }
-      await recargarPanel();
-    })();
-    return () => { vivo = false; };
-  }, [sesion, sesionConocida, recargarPanel]);
+  const onHistorial = useCallback(async (parcela) => {
+    const lecturas = await modulosRef.current;
+    await lecturas?.abrirHistorial(parcela);
+  }, []);
 
   return (
     <>
@@ -110,7 +69,19 @@ export default function App() {
           : null}
       />
 
-      <div className="contents" ref={panelRef} dangerouslySetInnerHTML={{ __html: HTML_PANEL }} />
+      <Panel
+        visible={sesionConocida && ruta.nombre === 'panel'}
+        sesion={sesion}
+        parcelas={parcelas}
+        alertas={alertas}
+        cargando={cargando}
+        errorParcelas={errorParcelas}
+        errorAlertas={errorAlertas}
+        recargar={recargar}
+        onMedir={onMedir}
+        onHistorial={onHistorial}
+      />
+
       <div className="contents" dangerouslySetInnerHTML={{ __html: HTML_DIALOGO }} />
 
       <Pie sesion={sesion} sesionConocida={sesionConocida} ruta={ruta.nombre} />

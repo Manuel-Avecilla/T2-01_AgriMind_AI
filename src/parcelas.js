@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient.js';
-import { parcelasEjemplo } from './datosEjemplo.js';
+import { parcelasEjemplo } from './datos/datosEjemplo.js';
 import { evaluarParcela } from './alertas.js';
 import { abrirRegistro, abrirHistorial, exportarParcelas } from './lecturas.js';
 

@@ -1,6 +1,11 @@
 import { Chart } from 'chart.js/auto';
 import { supabase } from './supabaseClient.js';
 import { evaluarParcela, sincronizarAlerta, UMBRALES } from './alertas.js';
+import { descargarCsv, nombreArchivo } from './datos/csv.js';
+
+// El CSV vive en datos/csv.js; se reexporta mientras el diálogo legacy siga
+// montado (la Fase 4 lo migrará y la Fase 5 retirará este puente).
+export { descargarCsv, exportarParcelas } from './datos/csv.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -36,32 +41,6 @@ function avisarHistorial(texto, esError = false) {
   destino.classList.toggle('error', esError);
 }
 
-function nombreArchivo(nombre) {
-  return nombre.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'parcela';
-}
-
-// ---------------------------------------------------------------------------
-// CSV (compatible con Excel en español: BOM, separador ';' y comillas dobles)
-// ---------------------------------------------------------------------------
-
-export function descargarCsv(cabeceras, filas, nombreBase) {
-  const escapar = (valor) => `"${String(valor ?? '').replaceAll('"', '""')}"`;
-  const contenido = [cabeceras, ...filas]
-    .map((fila) => fila.map(escapar).join(';'))
-    .join('\r\n');
-
-  const url = URL.createObjectURL(new Blob(['\uFEFF', contenido], { type: 'text/csv;charset=utf-8;' }));
-  const enlace = document.createElement('a');
-  enlace.href = url;
-  enlace.download = `${nombreBase}.csv`;
-  document.body.append(enlace);
-  enlace.click();
-  enlace.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 export function exportarLecturas() {
   if (!parcelaActual) return;
   descargarCsv(
@@ -73,23 +52,6 @@ export function exportarLecturas() {
       evaluarParcela(lectura.humedad_suelo).estado,
     ]),
     `lecturas-${nombreArchivo(parcelaActual.nombre)}`
-  );
-}
-
-export function exportarParcelas(parcelas) {
-  descargarCsv(
-    ['nombre', 'cultivo', 'superficie_ha', 'latitud', 'longitud', 'humedad_suelo_%', 'estado', 'notas'],
-    parcelas.map((parcela) => [
-      parcela.nombre,
-      parcela.cultivo,
-      parcela.superficie_ha,
-      parcela.latitud ?? '',
-      parcela.longitud ?? '',
-      parcela.humedad_suelo ?? '',
-      parcela.estado,
-      parcela.notas ?? '',
-    ]),
-    'parcelas'
   );
 }
 
