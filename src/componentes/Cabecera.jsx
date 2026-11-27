@@ -19,7 +19,7 @@ export function Cabecera({ sesion, sesionConocida, ruta, nombre, onCerrarSesion 
 
   return (
     <header className="cabecera sticky top-0 z-30 border-b border-borde bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="contenedor-ancho flex flex-wrap items-center justify-between gap-3 py-3">
         <a href="#/inicio" className="flex min-h-11 items-center gap-2.5 rounded-md text-marino no-underline">
           <Logo />
           <span className="flex flex-col leading-tight">

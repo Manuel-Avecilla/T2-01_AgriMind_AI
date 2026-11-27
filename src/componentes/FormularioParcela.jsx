@@ -89,7 +89,7 @@ export function FormularioParcela({ editando, onCambiarEditando, aviso, onAvisar
   const esError = Boolean(errorCarga) || aviso.esError;
 
   return (
-    <section className="panel lg:sticky lg:top-24" aria-labelledby="titulo-form">
+    <section className="panel xl:sticky xl:top-24" aria-labelledby="titulo-form">
       <h2 id="titulo-form">{editando ? `Editar ${editando.nombre}` : 'Añadir parcela'}</h2>
       <form id="form" ref={formRef} noValidate onSubmit={guardar}>
         <input type="hidden" id="id" value={campos.id} readOnly />

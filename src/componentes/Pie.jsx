@@ -3,7 +3,7 @@ import { ENLACES, hrefDe, visibleNav } from './navegacion.js';
 export function Pie({ sesion, sesionConocida, ruta }) {
   return (
     <footer className="mt-auto border-t border-borde bg-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-sm text-tinta-suave sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div className="contenedor-ancho flex flex-col gap-4 py-6 text-sm text-tinta-suave lg:flex-row lg:items-center lg:justify-between">
         <p className="m-0 max-w-2xl">AgriMind AI es una aplicación de agricultura de precisión del proyecto T2-01. Tus datos permanecen en tu cuenta.</p>
         <nav aria-label="Navegación del pie" className="flex flex-wrap gap-x-4 gap-y-2">
           {ENLACES.map(({ nav, ruta: destino, texto }) => {

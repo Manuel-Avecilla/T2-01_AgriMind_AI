@@ -75,7 +75,7 @@ export function Panel({
 
   return (
     <section id="app" aria-labelledby="panel-titulo" className="flex-1" hidden={!visible} aria-busy={cargando || undefined}>
-      <div className="mx-auto max-w-7xl px-4 pb-14 pt-6 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
+      <div className="contenedor-ancho pb-12 pt-5 sm:pb-14 sm:pt-7">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
           <div>
             <h1 id="panel-titulo" tabIndex={-1} className="m-0 text-2xl font-bold tracking-tight text-marino sm:text-3xl">Panel</h1>
@@ -87,7 +87,7 @@ export function Panel({
 
         <AlertasActivas alertas={alertas} errorCarga={errorAlertas} recargar={recargar} />
 
-        <main className="grid items-start gap-6 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+        <main className="grid items-start gap-5 xl:grid-cols-[minmax(240px,300px)_minmax(0,1fr)]">
           <FormularioParcela
             editando={editando}
             onCambiarEditando={setEditando}
