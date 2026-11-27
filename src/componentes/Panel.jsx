@@ -59,10 +59,10 @@ export function Panel({
   }
 
   async function ejemplos() {
-    if (!window.confirm('Se añadirán las 3 parcelas de ejemplo a tu cuenta. ¿Continuar?')) return;
+    if (!window.confirm('Se añadirán 3 parcelas de ejemplo, cada una con 12 lecturas y sus alertas. ¿Continuar?')) return;
     try {
       await insertarEjemplos();
-      avisar('Parcelas de ejemplo cargadas.');
+      avisar('Parcelas, lecturas y alertas de ejemplo cargadas.');
       await recargar();
     } catch (error) {
       avisar(error.message, true);
