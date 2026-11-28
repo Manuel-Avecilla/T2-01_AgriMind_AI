@@ -4,6 +4,7 @@ const VISTAS = new Map([
   ['inicio', { titulo: 'AgriMind AI · Agricultura de precisión', etiqueta: 'Inicio', tituloId: 'inicio-titulo' }],
   ['acceso', { titulo: 'AgriMind AI · Acceso', etiqueta: 'Acceso', tituloId: 'auth-titulo' }],
   ['panel', { titulo: 'AgriMind AI · Panel', etiqueta: 'Panel', tituloId: 'panel-titulo' }],
+  ['privacidad', { titulo: 'AgriMind AI · Privacidad', etiqueta: 'Privacidad', tituloId: 'privacidad-titulo' }],
 ]);
 
 function leerRuta() {

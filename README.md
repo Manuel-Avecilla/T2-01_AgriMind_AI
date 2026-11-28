@@ -97,9 +97,10 @@ src/
 │   ├── Resumen.jsx         # contadores derivados
 │   ├── AlertasActivas.jsx  # resolver / descartar
 │   ├── FormularioParcela.jsx / ListaParcelas.jsx
-│   ├── DialogoLectura.jsx  # medir e historial (<dialog>)
+│   ├── Dialogo.jsx / DialogoParcela.jsx / DialogoMedir.jsx / DialogoHistorial.jsx
 │   ├── GraficoHumedad.jsx  # Chart.js con franjas de umbral
-│   ├── Cabecera.jsx / Pie.jsx / Inicio.jsx / Logo.jsx / navegacion.js
+│   ├── Cabecera.jsx / Pie.jsx / Inicio.jsx / Privacidad.jsx / Logo.jsx
+│   ├── navegacion.js / enlaces.js
 └── datos/                  # capa de datos: solo supabase-js, sin DOM
     ├── auth.js             # sesión, login, registro, OAuth y mensajes de error
     ├── parcelas.js         # CRUD de parcelas + inserción de ejemplos
@@ -118,7 +119,7 @@ No existen `server.js`, `Dockerfile`, `docker-compose.yml`, `db/` ni endpoints `
 
 ## Arquitectura y rutas
 
-- **Rutas por hash** ([`src/hooks/useRuta.js`](src/hooks/useRuta.js)): `#/inicio`, `#/acceso`, `#/panel` y `#/acceso?tab=registro`. Sin sesión, `#/panel` redirige a acceso; con sesión, acceso redirige a panel. Se actualizan `document.title`, el foco del título y un anuncio `aria-live`.
+- **Rutas por hash** ([`src/hooks/useRuta.js`](src/hooks/useRuta.js)): `#/inicio`, `#/acceso`, `#/panel`, `#/privacidad` y `#/acceso?tab=registro`. Sin sesión, `#/panel` redirige a acceso; con sesión, acceso redirige a panel. Privacidad es pública. Se actualizan `document.title`, el foco del título y un anuncio `aria-live`.
 - **Sesión** ([`src/hooks/useSesion.js`](src/hooks/useSesion.js)): se resuelve con `getSession()` antes de pintar para evitar parpadeo, se ignora el `INITIAL_SESSION` posterior del listener y los cambios se serializan en una cola. Mientras no se conozca, `App.jsx` muestra una pantalla de arranque.
 - **Datos** ([`src/datos/`](src/datos/)): única capa de acceso a Supabase; las vistas solo reciben props. `usePanel` carga parcelas y alertas con `Promise.allSettled` y expone `recargar()` tras cada cambio.
 - **Tablas:** `profiles`, `parcelas`, `lecturas` y `alertas`, filtradas por `auth.uid()` mediante RLS. `lecturas` y `alertas` comprueban además que la parcela referenciada pertenece al usuario.

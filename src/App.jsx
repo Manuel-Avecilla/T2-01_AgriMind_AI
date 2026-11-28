@@ -4,6 +4,7 @@ import { Inicio } from './componentes/Inicio.jsx';
 import { Logo } from './componentes/Logo.jsx';
 import { Panel } from './componentes/Panel.jsx';
 import { Pie } from './componentes/Pie.jsx';
+import { Privacidad } from './componentes/Privacidad.jsx';
 import { usePanel } from './hooks/usePanel.js';
 import { useRuta } from './hooks/useRuta.js';
 import { useSesion } from './hooks/useSesion.js';
@@ -54,7 +55,9 @@ export default function App() {
         recargar={recargar}
       />
 
-      <Pie sesion={sesion} sesionConocida={sesionConocida} ruta={ruta.nombre} />
+      <Privacidad visible={sesionConocida && ruta.nombre === 'privacidad'} />
+
+      <Pie ruta={ruta.nombre} />
     </>
   );
 }
