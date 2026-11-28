@@ -15,13 +15,15 @@ export function ListaParcelas({
   onHistorial,
   onEjemplos,
 }) {
+  // Abierto = icono/aria al instante; montado = ciclo de vida del portal; visible = animación.
   const [menuAbiertoId, setMenuAbiertoId] = useState(null);
+  const [menuMontadoId, setMenuMontadoId] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const botonRef = useRef(null);
   const menuRef = useRef(null);
   const temporizadorRef = useRef(null);
 
-  const parcelaMenu = parcelas.find((parcela) => parcela.id === menuAbiertoId);
+  const parcelaMenu = parcelas.find((parcela) => parcela.id === menuMontadoId);
 
   function limpiarTemporizador() {
     if (temporizadorRef.current != null) {
@@ -59,20 +61,22 @@ export function ListaParcelas({
   function abrirMenu(parcela, evento) {
     limpiarTemporizador();
     botonRef.current = evento.currentTarget;
-    if (menuAbiertoId === parcela.id) {
+    setMenuAbiertoId(parcela.id);
+    if (menuMontadoId === parcela.id) {
       // Se pulsó de nuevo mientras se estaba cerrando: solo se revela.
       setMenuVisible(true);
       return;
     }
-    setMenuAbiertoId(parcela.id);
+    setMenuMontadoId(parcela.id);
     setMenuVisible(false);
   }
 
   function cerrarMenu(devolverFoco = false) {
     limpiarTemporizador();
+    setMenuAbiertoId(null);
     setMenuVisible(false);
     temporizadorRef.current = setTimeout(() => {
-      setMenuAbiertoId(null);
+      setMenuMontadoId(null);
       temporizadorRef.current = null;
     }, DURACION_CIERRE);
     if (devolverFoco) botonRef.current?.focus();
@@ -84,7 +88,7 @@ export function ListaParcelas({
   }
 
   useLayoutEffect(() => {
-    if (menuAbiertoId == null) return undefined;
+    if (menuMontadoId == null) return undefined;
     colocarMenu();
     const alAjustar = () => colocarMenu();
     window.addEventListener('scroll', alAjustar, true);
@@ -93,14 +97,14 @@ export function ListaParcelas({
       window.removeEventListener('scroll', alAjustar, true);
       window.removeEventListener('resize', alAjustar);
     };
-  }, [menuAbiertoId]);
+  }, [menuMontadoId]);
 
   // Un frame con opacity-0/scale-96 antes de mostrarlo para que la entrada se anime.
   useEffect(() => {
-    if (menuAbiertoId == null || menuVisible) return undefined;
+    if (menuMontadoId == null || menuVisible) return undefined;
     const cuadro = requestAnimationFrame(() => setMenuVisible(true));
     return () => cancelAnimationFrame(cuadro);
-  }, [menuAbiertoId, menuVisible]);
+  }, [menuMontadoId, menuVisible]);
 
   useEffect(() => {
     if (!menuVisible) return;
@@ -109,7 +113,7 @@ export function ListaParcelas({
 
   // Cierra por clic fuera (el botón y el propio menú se excluyen) y con Escape.
   useEffect(() => {
-    if (menuAbiertoId == null) return undefined;
+    if (menuMontadoId == null) return undefined;
     const alPointer = (evento) => {
       if (!(evento.target instanceof Element)) return;
       if (menuRef.current?.contains(evento.target)) return;
@@ -125,7 +129,7 @@ export function ListaParcelas({
       document.removeEventListener('pointerdown', alPointer);
       document.removeEventListener('keydown', alTecla);
     };
-  }, [menuAbiertoId]);
+  }, [menuMontadoId]);
 
   useEffect(() => () => limpiarTemporizador(), []);
 
@@ -181,7 +185,7 @@ export function ListaParcelas({
               const humedad = parcela.humedad_suelo == null
                 ? '—'
                 : `${Number(parcela.humedad_suelo)} %`;
-              const abierto = menuVisible && menuAbiertoId === parcela.id;
+              const abierto = menuAbiertoId === parcela.id;
 
               return (
                 <tr key={parcela.id} className={parcela.id === editandoId ? 'editando' : undefined}>
@@ -223,7 +227,7 @@ export function ListaParcelas({
       <p id="vacio" className="vacio" hidden={parcelas.length > 0}>
         Aún no hay parcelas. Pulsa «+» para añadir la primera o carga las de ejemplo.
       </p>
-      {menuAbiertoId != null && parcelaMenu && createPortal(
+      {menuMontadoId != null && parcelaMenu && createPortal(
         <div
           ref={menuRef}
           id={`acciones-${parcelaMenu.id}`}
