@@ -223,6 +223,25 @@
     @apply bg-esmeralda-suave;
   }
 
+  /* Menú de acciones: se posiciona desde JS en coordenadas de viewport (portal en body). */
+  .menu-acciones {
+    @apply pointer-events-none fixed z-50 w-44 rounded-lg border border-borde bg-white p-1 opacity-0 shadow-md transition-[opacity,transform] duration-150 ease-out;
+    transform: scale(0.96);
+  }
+  .menu-acciones-abierto {
+    @apply pointer-events-auto opacity-100;
+    transform: scale(1);
+  }
+  .menu-acciones-item {
+    @apply flex min-h-11 w-full cursor-pointer items-center rounded-md px-3 py-1.5 text-left text-sm font-semibold text-marino hover:bg-papel sm:min-h-0;
+  }
+  .menu-acciones-item.primario {
+    @apply text-esmeralda-osc hover:bg-esmeralda-suave;
+  }
+  .menu-acciones-item.peligro {
+    @apply text-rojo-osc hover:bg-rojo-suave;
+  }
+
   .auth-caja {
     @apply w-full max-w-md rounded-xl border border-borde bg-white p-5 sm:p-8;
   }
