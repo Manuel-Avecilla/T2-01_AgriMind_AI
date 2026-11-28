@@ -21,6 +21,7 @@ export default function App() {
         sesionConocida={sesionConocida}
         ruta={ruta.nombre}
         nombre={nombre}
+        numeroAlertas={alertas.length}
         onCerrarSesion={cerrarSesion}
       />
 

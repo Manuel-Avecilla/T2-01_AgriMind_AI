@@ -16,7 +16,7 @@ export function visibleNav(nav, sesion, sesionConocida) {
 }
 
 export function claseNav(activo) {
-  return `inline-flex min-h-11 items-center rounded-md px-3 py-2 text-sm font-semibold no-underline transition-colors ${
+  return `inline-flex min-h-11 items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold no-underline transition-colors ${
     activo
       ? 'bg-esmeralda-suave text-esmeralda-osc'
       : 'text-marino hover:bg-papel hover:text-marino'
