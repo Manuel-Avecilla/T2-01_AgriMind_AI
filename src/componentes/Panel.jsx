@@ -3,7 +3,7 @@ import { borrarParcela, insertarEjemplos } from '../datos/parcelas.js';
 import { AlertasActivas } from './AlertasActivas.jsx';
 import { DialogoHistorial } from './DialogoHistorial.jsx';
 import { DialogoMedir } from './DialogoMedir.jsx';
-import { FormularioParcela } from './FormularioParcela.jsx';
+import { DialogoParcela } from './DialogoParcela.jsx';
 import { ListaParcelas } from './ListaParcelas.jsx';
 import { Resumen } from './Resumen.jsx';
 
@@ -17,15 +17,15 @@ export function Panel({
   errorAlertas,
   recargar,
 }) {
-  const [editando, setEditando] = useState(null);
   const [aviso, setAviso] = useState({ texto: '', esError: false });
-  const [dialogo, setDialogo] = useState(null); // { parcelaId, tipo }
+  const [dialogo, setDialogo] = useState(null); // { tipo, parcelaId? }
 
-  // La parcela se deriva del listado: tras guardar, onCambio() actualiza el
-  // estado del panel antes de cerrar el modal.
-  const parcelaDialogo = dialogo
+  // La parcela se deriva del listado para no mostrar datos obsoletos tras una
+  // recarga. En 'crear' no hay parcela asociada.
+  const parcelaDialogo = dialogo?.parcelaId
     ? parcelas.find((parcela) => parcela.id === dialogo.parcelaId) ?? null
     : null;
+  const editandoId = dialogo?.tipo === 'editar' ? dialogo.parcelaId : null;
 
   const cerrarDialogo = useCallback(() => setDialogo(null), []);
 
@@ -37,10 +37,18 @@ export function Panel({
     setDialogo({ parcelaId: parcela.id, tipo });
   }
 
-  // Una sesión distinta no debe dejar el formulario ni el diálogo de una
-  // parcela ajena abiertos.
+  function abrirCreacion() {
+    avisar('');
+    setDialogo({ tipo: 'crear' });
+  }
+
+  function empezarEdicion(parcela) {
+    avisar('');
+    setDialogo({ parcelaId: parcela.id, tipo: 'editar' });
+  }
+
+  // Una sesión distinta no debe dejar un diálogo de otra cuenta abierto.
   useEffect(() => {
-    setEditando(null);
     setAviso({ texto: '', esError: false });
     setDialogo(null);
   }, [sesion?.user?.id]);
@@ -49,7 +57,6 @@ export function Panel({
     if (!window.confirm(`¿Borrar la parcela «${parcela.nombre}»? Esta acción no se puede deshacer.`)) return;
     try {
       await borrarParcela(parcela.id);
-      if (editando?.id === parcela.id) setEditando(null);
       if (dialogo?.parcelaId === parcela.id) setDialogo(null);
       avisar(`Parcela «${parcela.nombre}» borrada.`);
       await recargar();
@@ -69,15 +76,10 @@ export function Panel({
     }
   }
 
-  function empezarEdicion(parcela) {
-    avisar('');
-    setEditando(parcela);
-  }
-
   return (
     <section id="app" aria-labelledby="panel-titulo" className="flex-1" hidden={!visible} aria-busy={cargando || undefined}>
-      <div className="contenedor-ancho pb-12 pt-5 sm:pb-14 sm:pt-7">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
+      <div className="contenedor-ancho pb-10 pt-4 sm:pb-12 sm:pt-5">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
           <div>
             <h1 id="panel-titulo" tabIndex={-1} className="m-0 text-2xl font-bold tracking-tight text-marino sm:text-3xl">Panel</h1>
             <p className="mb-0 mt-1 text-sm text-tinta-suave sm:text-base">Estado de tus parcelas y alertas pendientes.</p>
@@ -88,18 +90,11 @@ export function Panel({
 
         <AlertasActivas alertas={alertas} errorCarga={errorAlertas} recargar={recargar} />
 
-        <main className="grid items-start gap-5 xl:grid-cols-[minmax(240px,300px)_minmax(0,1fr)]">
-          <FormularioParcela
-            editando={editando}
-            onCambiarEditando={setEditando}
-            aviso={aviso}
-            onAvisar={avisar}
-            errorCarga={errorParcelas}
-            recargar={recargar}
-          />
+        <main className="min-w-0">
           <ListaParcelas
             parcelas={parcelas}
-            editandoId={editando?.id ?? null}
+            editandoId={editandoId}
+            onCrear={abrirCreacion}
             onEditar={empezarEdicion}
             onBorrar={borrar}
             onEjemplos={ejemplos}
@@ -108,19 +103,37 @@ export function Panel({
           />
         </main>
 
-        {dialogo && parcelaDialogo && (
-          dialogo.tipo === 'medir' ? (
-            <DialogoMedir
-              parcela={parcelaDialogo}
-              onCerrar={cerrarDialogo}
-              onCambio={recargar}
-            />
-          ) : (
-            <DialogoHistorial
-              parcela={parcelaDialogo}
-              onCerrar={cerrarDialogo}
-            />
-          )
+        {dialogo?.tipo === 'crear' && (
+          <DialogoParcela
+            aviso={aviso}
+            onAvisar={avisar}
+            errorCarga={errorParcelas}
+            onCerrar={cerrarDialogo}
+            recargar={recargar}
+          />
+        )}
+        {dialogo?.tipo === 'editar' && parcelaDialogo && (
+          <DialogoParcela
+            parcela={parcelaDialogo}
+            aviso={aviso}
+            onAvisar={avisar}
+            errorCarga={errorParcelas}
+            onCerrar={cerrarDialogo}
+            recargar={recargar}
+          />
+        )}
+        {dialogo?.tipo === 'medir' && parcelaDialogo && (
+          <DialogoMedir
+            parcela={parcelaDialogo}
+            onCerrar={cerrarDialogo}
+            onCambio={recargar}
+          />
+        )}
+        {dialogo?.tipo === 'historial' && parcelaDialogo && (
+          <DialogoHistorial
+            parcela={parcelaDialogo}
+            onCerrar={cerrarDialogo}
+          />
         )}
       </div>
     </section>

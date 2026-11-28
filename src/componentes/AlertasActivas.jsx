@@ -31,7 +31,7 @@ export function AlertasActivas({ alertas, errorCarga, recargar }) {
   }
 
   return (
-    <section className="panel mb-6" aria-labelledby="titulo-alertas">
+    <section className="panel mb-4" aria-labelledby="titulo-alertas">
       <div className="listado-cabecera">
         <div className="flex items-center gap-3">
           <h2 id="titulo-alertas" className="m-0">Alertas activas</h2>
